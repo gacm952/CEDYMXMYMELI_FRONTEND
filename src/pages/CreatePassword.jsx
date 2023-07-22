@@ -1,0 +1,135 @@
+import { useState, useEffect } from "react"
+import { Link, useParams } from 'react-router-dom'
+import costumerAxios from "../config/costumerAxios"
+import Alert from "../components/Alert"
+
+const CreatePassword = () => {
+
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [alert, setAlert] = useState('')
+  const [tokenValid, setTokenValid] = useState(false)
+  const [changedPassword, setChangedPassword] = useState(false)
+  const params = useParams()
+  const {token} = params
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        await costumerAxios(`/resetpassword/${token}`)
+        setTokenValid(true)
+
+      } catch (error) {
+        setAlert({
+          msg: error.response.data.msg,
+          error: true
+        })
+      }
+    }
+    checkToken()
+  }, [])
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+
+    if(password.length < 6) {
+      setAlert({
+        msg: 'La contraseña debe ser mínimo de 6 caracteres',
+        error: true
+      })
+      return
+    }
+
+    if(password !== confirmPassword) {
+      setAlert({
+        msg: 'Las contraseñas deben de ser iguales',
+        error: true
+      })
+      return
+    }
+
+    try {
+      const url = `/resetpassword/${token}`
+
+      const { data } = await costumerAxios.post(url, { password })
+      setAlert({
+        msg: data.msg,
+        error: false
+      })
+
+      setChangedPassword(true)
+
+    } catch (error) {
+      setAlert({
+        msg: error.response.data.msg,
+        error: true
+      })
+    }
+
+
+  }
+
+  const { msg } = alert
+
+  return (
+    <>
+      <section>
+      <div className="flex justify-center mx-auto max-w-screen-xl px-4 pb-8 pt-20 sm:px-6 lg:px-8">      
+          <div className="max-w-xl shadow-md bg-white shadow-gray-600 border-2 border-emerald-600 rounded-3xl">
+            <div className="p-8 sm:p-32 lg:py-40 lg:px-16 lg:my-12">
+                 <h2 className="text-4xl font-extrabold sm:text-5xl font-poppins text-gray-900 mb-12 capitalize">Crea tu contraseña</h2>
+              <div className="mt-6 font-poppins">
+                 
+              { msg && <Alert alert={alert}/> }
+
+              { tokenValid && ( <form onSubmit={handleSubmit} className="space-y-1">
+                    <div>
+                        <label 
+                          htmlFor="password" 
+                          className="block font-medium text-gray-700 mt-2 lg:mt-0">Ingresa tu Contraseña
+                        </label>
+                        <input 
+                          id="password"
+                          type="password" 
+                          className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          placeholder="Escribe Tu Nueva Contraseña"
+                          value={password}
+                          onChange={e => setPassword(e.target.value)}
+                          />
+                         <label 
+                          htmlFor="password2" 
+                          className="block font-medium text-gray-700 mt-2 lg:mt-0">Ingresa De Nuevo tu Contraseña
+                        </label>
+                        <input 
+                          id="password2"
+                          type="password" 
+                          className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          placeholder="Escribe De Nuevo tu Contraseña"
+                          value={confirmPassword}
+                          onChange={e => setConfirmPassword(e.target.value)}
+                          />
+                      </div>
+                  <div>
+                    <button type="submit" className="mt-4 w-full py-3 bg-emerald-600 text-white hover:bg-emerald-800"> Guardar Nueva Contraseña
+                    </button>
+                  </div>
+                </form>               
+                )}
+
+                
+                  {changedPassword && (
+                    <p className="mt-6 text-sm text-grey-600 text-center">
+                    <Link to="/" className="font-medium text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
+                    </p>
+                  )}
+
+              </div>
+            </div>
+          </div>
+      </div>
+      </section>
+    </>
+  )
+}
+
+export default CreatePassword

@@ -1,0 +1,66 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import AuthLayout from "./layouts/AuthLayout.jsx";
+import ProtectRute from "./layouts/ProtectRute.jsx";
+import ProtectRuteAdmission from "./layouts/ProtectRuteAdmission.jsx";
+
+import Login from "./pages/Login.jsx";
+import Booking from "./pages/Booking.jsx";
+import Register from "./pages/Register.jsx";
+import ForgotPassword from "./pages/forgotPassword.jsx";
+import NewPassword from "./pages/NewPassword.jsx";
+import ConfirmAcc from "./pages/ConfirmAcc.jsx";
+import Appointment from "./pages/Appointment.jsx";
+import EditBooking from "./pages/editBookings.jsx";
+import Bookings from "./pages/Bookings.jsx";
+import CancelBooking from "./pages/CancelBooking.jsx";
+import EditingBooking from "./pages/EditingBooking.jsx";
+import Vista from "./pages/Vista.jsx";
+import MenuAdmission from "./pages/MenuAdmission.jsx";
+import RebookingMassively from "./pages/RebookingMassively.jsx";
+import CreatePassword from "./pages/CreatePassword.jsx"; 
+
+import { AuthProvider } from './context/AuthProvider.jsx'
+import { BookingProvider } from './context/BookingProvider.jsx'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <BookingProvider>
+          <Routes>
+            <Route path="/" element={<AuthLayout/>}>
+                <Route index element={<Login/>}/>
+                <Route path="Booking" element={<Booking/>} />
+                <Route path="Register" element={<Register/>} />
+                <Route path="ForgotPassword" element={<ForgotPassword/>} />
+                <Route path="ForgotPassword/:token" element={<NewPassword/>} />
+                <Route path="CreatePassword/:token" element={<CreatePassword/>} />
+                <Route path="ConfirmAccount/:id" element={<ConfirmAcc/>} />
+            </Route>
+
+            <Route path="/Bookings" element={<ProtectRute/>}>  
+              <Route index element={<Bookings/>} />
+              <Route path="makeBooking" element={<Appointment/>} />
+              <Route path="editBooking" element={<EditBooking/>} />
+              <Route path="editBooking/:id" element={<EditingBooking/>} />
+              <Route path="cancelBooking" element={<CancelBooking/>} />
+            </Route>
+
+            <Route path="/cedym_system" element={<ProtectRuteAdmission/>}>  
+              <Route index element={<MenuAdmission/>} />
+              <Route path="vista-admission" element={<Vista/>} />
+              <Route path="register" element={<Register/>} />
+              <Route path="makeBooking" element={<Appointment/>} />
+              <Route path="editBooking" element={<EditBooking/>} />
+              <Route path="editBooking/:id" element={<EditingBooking/>} />
+              <Route path="rebooking" element={<RebookingMassively/>} />
+            </Route>
+          </Routes>
+        </BookingProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}
+
+export default App

@@ -1,0 +1,133 @@
+import { useState, useEffect, useContext  } from 'react'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { DigitalClock } from '@mui/x-date-pickers/DigitalClock';
+import { isWeekend, setDefaultOptions } from 'date-fns';
+import { es } from 'date-fns/locale';
+import BookingContext from '../context/BookingProvider';
+
+function Calendar({ onDateChange, onTimeChange }) {
+
+  setDefaultOptions({ locale: es })
+
+  const [value, setValue] = useState(new Date())
+  const [selectedTimes, setSelectedTimes] = useState([]);
+  const { dateFromBackend } = useContext(BookingContext);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  console.log(dateFromBackend)
+
+  useEffect(() => {
+    if (dateFromBackend) {
+      const disabledTimes = {};
+      dateFromBackend.forEach((booking) => {
+        const dateKey = booking.toDateString(); // Obtener una clave única para cada fecha
+        if (!disabledTimes[dateKey]) {
+          disabledTimes[dateKey] = [];
+        }
+        disabledTimes[dateKey].push(booking);
+      });
+      setSelectedTimes(disabledTimes);
+    }
+  }, [dateFromBackend]);
+
+  const handleDateChange = (newValue) => {
+    setValue(newValue);
+    onDateChange(newValue);
+  };
+
+  const handleTimeChange = (newValue) => {
+    setValue(newValue);
+    onTimeChange(newValue);
+  };
+
+  const disableNonCurrentYears = (date) => {
+    const currentYear = new Date().getFullYear();
+    const selectedYear = date.getFullYear();
+    return selectedYear !== currentYear;
+  };
+
+  const disableAfterThreeMonths = (date) => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+  
+    return date.getMonth() - currentMonth > 2;
+  };
+
+  const shouldDisableTime = (selectedTime) => {
+    const minHour = 8;
+    const maxHour = 18;
+    const restStartHour = 12;
+    const restEndHour = 14;
+  
+    const selectedHour = selectedTime.getHours();
+    const selectedMinutes = selectedTime.getMinutes();
+  
+    const dateKey = value.toDateString(); // Obtener la clave de la fecha seleccionada
+    const disabledTimesForDate = selectedTimes[dateKey];
+  
+    const countSelectedTimes = disabledTimesForDate ? disabledTimesForDate.filter(time =>
+      time.getHours() === selectedHour && time.getMinutes() === selectedMinutes
+    ).length : 0;
+  
+    return (
+      selectedHour < minHour ||
+      selectedHour > maxHour ||
+      (selectedHour === minHour && selectedMinutes < 0) ||
+      (selectedHour === maxHour && selectedMinutes > 0) ||
+      (selectedHour >= restStartHour && selectedHour < restEndHour) ||
+      countSelectedTimes >= 1
+    );
+  };
+
+  const shouldDisableDate = (date) => {
+
+    // Obtener una clave única para cada fecha
+   const dateKey = date.toDateString(); 
+   const disabledTimesForDate = selectedTimes[dateKey];
+ 
+   // Verificar si todas las citas están seleccionadas para el día
+   
+   const isAllTimesSelected = disabledTimesForDate && disabledTimesForDate.length === 144;
+
+   // No se pueda agendar para el mismo dia
+
+   const currentDate = new Date();
+   const isSameDate = date.toDateString() === currentDate.toDateString();
+ 
+   // Lógica para determinar si la fecha está deshabilitada
+
+   const isDisabled = isWeekend(date) || isAllTimesSelected || isSameDate;
+ 
+   return isDisabled;
+ };
+
+  return (
+      <LocalizationProvider dateAdapter={AdapterDateFns} localeText={es}>
+        <div className='grid grid-cols-1 sm:grid-cols-2 '>
+          <DateCalendar 
+          orientation="landscape"
+          disablePast="true" 
+          shouldDisableMonth={disableAfterThreeMonths}
+          shouldDisableYear={disableNonCurrentYears}
+          shouldDisableDate={shouldDisableDate}
+          value={selectedDate || undefined}     
+          onChange={handleDateChange} 
+          />
+          <div className='my-auto'>
+            <DigitalClock 
+              skipDisabled
+              orientation="landscape"
+              timeStep={15}
+              shouldDisableTime={shouldDisableTime}
+              value={value}
+              onChange={handleTimeChange}
+            />
+          </div>
+      </div>
+      </LocalizationProvider>
+  )
+}
+
+export default Calendar

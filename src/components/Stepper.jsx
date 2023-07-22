@@ -1,0 +1,568 @@
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom';
+import Calendar from "../components/Calendar"
+import useAuth from '../hooks/useAuth';
+import useBookings from '../hooks/useBookings';
+import Alert from '../components/Alert';
+import Alert2 from '../components/Alert2'
+import { useNavigate } from 'react-router-dom';
+import Modal3 from './Modal3';
+import Modal4 from './Modal4';
+import { parseISO, format } from 'date-fns';
+
+const Stepper = () => {
+
+  const [step, setStep] = useState(1); // Estado para rastrear el paso actual
+  const [userData, setUserData] = useState({}); // Estado para almacenar los datos del formulario de información del usuario
+  const [id, setId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null); // Cambia a null en lugar de cadena vacía
+  const [selectedTime, setSelectedTime] = useState(null); // Cambia a null en lugar de cadena vacía 
+  const [selectedOption, setSelectedOption] = useState(userData.Type || "");
+  const [showSecondSelect, setShowSecondSelect] = useState(false);
+  const [secondSelectValue, setSecondSelectValue] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [alert, setAlert] = useState({});
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [searchEmail, setSearchEmail] = useState('');
+  const [foundUserId, setFoundUserId] = useState(null);
+  const [alert2, setAlert2] = useState({})
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen1, setIsModalOpen1] = useState(false);
+  const [showCitaValorativa, setShowCitaValorativa] = useState(false);
+  const [userFoundNames, setUserFoundNames] = useState(''); 
+
+  console.log(userFoundNames)
+
+  const navigate = useNavigate();
+  const params = useParams()
+  const { allBookings, submitBooking } = useBookings();
+  const { auth, allUsers } = useAuth();
+  const roleUser = [auth].some((role) => role.role === "User")
+  const isResponsable = [auth].some((role) => role.responsable === true)
+  const bookingData = allBookings.find(booking => booking._id === params.id) 
+
+  useEffect(() => {
+    if (params.id) {
+      setId(params.id);
+
+      if (bookingData) {
+        setUserData((prevData) => ({
+          ...prevData,
+          Type: bookingData.Type || "",
+          subType: bookingData.subType || "",
+          Motive: bookingData.Motive || "",
+        }));
+        if (bookingData.dateHour) {
+          const dateHour = parseISO(bookingData.dateHour);
+          setSelectedDate(dateHour);
+          setSelectedTime(dateHour);
+        }
+      }
+    }
+  }, [params.id, bookingData]);
+
+  useEffect(() => {
+    if (isResponsable) {
+      setIsModalOpen1(true);
+    }
+  }, [isResponsable]);
+
+  useEffect(() => {
+  }, [foundUserId]);
+
+  useEffect(() => {
+    // Verificar si userData.Type es igual a "Particular"
+    if (userData.Type === "Particular") {
+      setShowCitaValorativa(true);
+    } else {
+      setShowCitaValorativa(false);
+    }
+  }, [userData.Type]);
+
+  const handleNextStep = () => {
+    
+    // Validar campos antes de pasar al siguiente paso
+
+    if (step === 1 && (!userData.Type || !userData.Motive || (userData.Type === "EPS" && !userData.subType))) {
+      setAlert({
+        msg: 'Completa todos los campos obligatorios antes de continuar.',
+        error: true
+      });
+      return
+    }
+
+    if (step === 2 && (!selectedDate || !selectedTime)) {
+      setAlert({
+        msg: 'Completa todos los campos obligatorios antes de continuar.',
+        error: true
+      });
+      return
+    }
+
+    // Pasar al siguiente paso
+
+    setStep(step + 1);
+
+    // Reiniciar la Alerta
+
+    setAlert({});
+
+  };
+
+  const handlePreviousStep = () => {
+    setStep(step - 1);
+  };
+
+  const handleUserDataChange = (e) => {
+    const { name, value } = e.target;
+    setUserData((prevData) => ({ ...prevData, [name]: value}));
+
+    const { Type, subType, Motive } = userData;
+    if (Type && Motive && (!Type === "EPS" || subType)) {
+      setIsFormValid(true);
+    } else {
+      setIsFormValid(false);
+    }
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
+  const handleTimeChange = (time) => {
+    setSelectedTime(time);
+  };
+
+  const handleFirstSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedOption(selectedValue);
+
+    setUserData((prevData) => ({ ...prevData, Type: selectedValue }));
+
+    if (selectedValue === "EPS") {
+        setShowSecondSelect(true);
+    } else {
+        setShowSecondSelect(false);
+    }
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+  
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setIsModalOpen1(false);
+  };
+
+  const stepText = {
+    1: "Completa el Siguiente Formulario.",
+    2: "Selecciona una Fecha Disponible.",
+    3: "Verifica tus Datos."
+  };
+
+  const {Type, subType, Motive} = userData
+  const dateHour = `${selectedDate}, ${selectedTime}`
+  const citaData = {
+    dateHour,
+    Type,
+    subType,
+    Motive
+  };
+
+  const handleConfirmCita = (e) => {
+
+    e.preventDefault();
+
+    // Crea el objeto `Date` combinando la fecha y la hora
+
+    const dateHour = new Date(selectedDate);
+    dateHour.setHours(selectedTime.getHours());
+    dateHour.setMinutes(selectedTime.getMinutes());
+
+    const formattedDateHour = format(dateHour, 'dd/MM/yyyy HH:mm:ss');
+
+    const target = bookingData?.bookingTo || bookingData?.bookingFor || auth._id
+
+    // Pasar los datos hacia el provider
+
+    submitBooking({id, dateHour, Type, subType, Motive, bookingTo: foundUserId }, 
+                  {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
+    
+    setAlert({
+      msg: 'Cita agendada correctamente, ¡te esperamos!',
+      error: false,
+    });
+
+    setIsButtonDisabled(true);
+
+    };
+     
+  const handleSearch = (e) => {
+
+    e.preventDefault();
+
+    const found = allUsers.find(user => user.document === parseInt(searchEmail));
+
+    const userFoundNames =  `${found.name} ${found.lastName}`
+    
+      if (found) {
+        
+        setFoundUserId(found._id);
+
+        setSearchEmail(userFoundNames)
+
+        setAlert2({
+          msg: `Paciente encontrado`,
+          error: false,
+        });
+
+        setTimeout(() => {
+          setAlert2({});
+        }, 5000);
+
+        if (found.responsable) {
+          openModal()
+        }
+
+      } else {
+
+        setFoundUserId(null);
+
+        setAlert2({
+          msg: 'Cédula No Encontrada',
+          error: true,
+        });
+
+        setTimeout(() => {
+          setAlert2({});
+        }, 2000);
+      }
+    };
+
+  const renderStepContent = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div>
+            <form className='max-w-screen-md mx-auto'>
+
+              {(!roleUser && !params.id) && (  <div className='flex flex-col my-4'>
+                  <label
+                          className="inline-flex mb-2 text-sm text-gray-800"
+                          htmlFor='' 
+                        >Ingresa el Documento del Paciente </label>
+                     
+                      <input 
+                       type="search"   
+                       placeholder='Buscar Cédula'
+                       className='w-full
+                              px-3
+                              py-2
+                              text-gray-800
+                              border
+                              rounded
+                              outline-none
+                              bg-gray-50
+                              focus:ring
+                              ring-emerald-500
+                              mb-4
+                              ' 
+                        value={searchEmail}
+                        onChange={e => setSearchEmail(e.target.value)}>
+                     </input>
+                     <div className='flex justify-end'>
+                    <button className='  
+                    px-12
+                    py-2
+                    text-sm text-white
+                  bg-emerald-700
+                    rounded-lg
+                    outline-none
+                  hover:bg-emerald-800
+                  ring-indigo-300' 
+                  onClick={handleSearch}>Buscar</button>
+                  </div>
+                  <Modal3 isOpen={isModalOpen} onClose={closeModal} />
+                </div> )}
+               
+               <div className="flex flex-col my-4">
+                  <label
+                    className="inline-flex mb-2 text-sm text-gray-800"
+                    htmlFor='type' 
+                  >Selecciona Como Te Identificas </label
+                  >
+                  <select
+                    id='type'
+                    className="
+                      w-full
+                      px-3
+                      py-2
+                      text-gray-800
+                      border
+                      rounded
+                      outline-none
+                      bg-gray-50
+                      focus:ring
+                      ring-emerald-500
+                      font-poppins
+                    "
+                    name="Type" // Nombre del campo relacionado en el estado userData
+                    value={userData.Type || ''}
+                    onChange={handleFirstSelectChange}
+                  >
+                    <option value="" hidden>Selecciona Una Opción</option>
+                    <option value="Particular">Particular</option>
+                    <option value="EPS" >EPS</option>
+                    <option value="Visitador Médico" >Visitador Médico</option>
+                    <option value="Medicina Prepagada" >Medicina Prepagada</option>
+                  </select>
+
+                    
+                    {/* IF EPS CLICKED SHOW SECOND SELECT */}
+
+                    {userData.Type === "EPS" && (
+                <div className="flex flex-col mt-4">
+                    <label 
+                    className="inline-flex mb-2 text-sm text-gray-800" 
+                    htmlFor='subType' >
+                        Selecciona tu EPS
+                    </label>
+                    <select
+                        id='subType'
+                        name="subType"
+                        className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                        "
+                        value={userData.subType || ""}
+                        onChange={handleUserDataChange}
+                    >
+                        <option value="" hidden>Selecciona una opción</option>
+                        <option value="Sanitas">Sanitas</option>
+                        <option value="Nueva EPS">Nueva EPS</option>
+                    </select>
+                </div>
+              )}
+
+                {/* IF Medicina Prepagada CLICKED SHOW SECOND SELECT */}
+
+                {userData.Type === "Medicina Prepagada" && (
+                <div className="flex flex-col mt-4">
+                    <label 
+                    className="inline-flex mb-2 text-sm text-gray-800" 
+                    htmlFor='subType' >
+                        Selecciona a Cual Perteneces
+                    </label>
+                    <select
+                        id='subType'
+                        name="subType"
+                        className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                        "
+                        value={userData.subType || ""}
+                        onChange={handleUserDataChange}
+                    >
+                        <option value="" hidden>Selecciona una opción</option>
+                        <option value="SURA">SURA</option>
+                        <option value="Coomeva">Coomeva</option>
+                        <option value="MediGold">MediGold</option>
+                        <option value="Seguros Bolivar">Seguros Bolivar</option>
+                        <option value="Allianz">Allianz</option>
+                        <option value="Sanitas Premiun">Sanitas Premiun</option>
+                    </select>
+                </div>
+              )}
+
+                </div>
+
+                <div className="flex flex-col">
+                    <label className="inline-flex mb-2 text-sm text-gray-800">
+                        Selecciona el Tipo de Cita
+                    </label>
+                    <select
+                        className="
+                        w-full
+                        px-3
+                        py-2
+                        text-gray-800
+                        border
+                        rounded
+                        outline-none
+                        bg-gray-50
+                        focus:ring
+                        ring-emerald-500
+                        "
+                        name="Motive" // Nombre del campo relacionado en el estado userData
+                        value={userData.Motive || ''}
+                        onChange={handleUserDataChange}
+                    >
+                        <option value="" hidden>Selecciona Una Opción</option>
+                        {showCitaValorativa && (
+                        <option value="Cita Valorativa">Cita Valorativa</option>
+                        )}
+                        <option value="Nutricion">Nutrición</option>
+                        <option value="Medicina Interna">Medicina Interna</option>
+                        <option value="Medicina Interna">Medicina Integral</option>
+                        <option value="Obesidad">Psicología</option>
+                    </select>
+                </div>
+
+
+            </form>
+          </div>
+        );
+      case 2:
+        return (
+          <div>
+            <Calendar  
+          selectedDate={selectedDate}
+          selectedTime={selectedTime} 
+          onDateChange={handleDateChange} 
+          onTimeChange={handleTimeChange}/>
+          </div>
+        );
+      case 3:
+        return (
+          <div className='text-justify p-4 '>
+            <p>Tipo de Paciente: <span className='font-semibold'>{userData.Type} {userData.Type === "Medicina Prepagada" ? userData.subType : ""} </span> </p>
+            {userData.Type === "EPS" && (
+            <p>EPS: <span className='font-semibold'> {userData.subType}</span></p>
+            )}            
+            <p>Motivo: <span className='font-semibold'>{userData.Motive}</span> </p>
+            <p>Fecha Seleccionada: <span className='font-semibold'>{selectedDate?.toLocaleDateString()}</span> </p>
+            <p>Hora Seleccionada: <span className='font-semibold'>{selectedTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> </p>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const HeaderTitleUser = () => {
+    return (
+      <h2 className=" mb-4 text-2xl font-bold text-center text-gray-800 lg:text-3xl md:mb-6">
+      Señor/a {auth.name} {auth.lastName} { params.id ? <span>ReAgenda</span> : <span>Para Agendar</span> } Tu Cita
+      </h2>
+    )
+  };
+
+  const HeaderTitleEmployees = () => {
+      return (
+        <h2 className=" mb-4 text-2xl font-bold text-center text-gray-800 lg:text-3xl md:mb-6">
+        Completa Los Pasos Para { params.id ? <span>ReAgendar</span> : <span>Agendar</span> } Una Cita  
+        </h2>
+      )
+  };
+
+  const { msg } = alert
+
+  const {msg:msg1} = alert2
+
+  return (  
+    <div>
+      <div className='mx-auto max-w-screen-md'>
+          <header className="my-8">
+
+          {roleUser ? <HeaderTitleUser/> : <HeaderTitleEmployees/>}
+          
+          <p className="max-w-screen-md mx-auto text-center text-gray-500 md:text-lg">
+          {stepText[step]}
+          </p>
+
+          </header>
+
+          <Modal4 isOpen={isModalOpen1} onClose={closeModal}/> 
+
+          {msg1 && <Alert2 alert={alert2}/>}
+
+          {msg && <Alert alert={alert}/> }
+
+          {renderStepContent()}
+
+          <div className='flex items-center justify-between mt-4'>
+              <div>
+
+                {step <= 1 && (
+                  
+                  <button
+                  to="/Bookings"
+                  className="
+                  inline-flex
+                  items-center
+                  px-6
+                  py-2
+                  text-sm text-gray-800
+                  rounded-lg
+                  shadow
+                  outline-none
+                  gap-x-1
+                  bg-gray-100
+                  hover:bg-gray-200
+                  "
+                  onClick={() => navigate(-1)}>Volver
+                  
+                </button>
+
+                )}
+              
+                  {step > 1 && (
+                      
+                  <button 
+                  className="
+                  inline-flex
+                  items-center
+                  px-6
+                  py-2
+                  text-sm text-gray-800
+                  rounded-lg
+                  shadow
+                  outline-none
+                  gap-x-1
+                  bg-gray-100
+                  hover:bg-gray-200
+                  "
+                  onClick={handlePreviousStep}
+                  >Paso Anterior</button>
+              
+                  )}
+              </div>
+              <div>
+                  {step < 3 ? (
+                  
+                  <button 
+                  className="
+                      px-6
+                      py-2
+                      text-sm text-white
+                  bg-emerald-700
+                      rounded-lg
+                      outline-none
+                  hover:bg-emerald-800
+                  ring-indigo-300
+                              "
+                  onClick={handleNextStep}>Siguiente Paso</button>
+                  
+                  )
+                  : (
+                    <button 
+                      className="
+                      px-6
+                      py-2
+                      text-sm text-white
+                      bg-emerald-700
+                      rounded-lg
+                      outline-none
+                      hover:bg-emerald-800
+                      ring-indigo-300"
+                      onClick={handleConfirmCita}
+                      disabled={isButtonDisabled}
+                      >{ params.id ? <span>Re-Agendar Cita</span> : <span>Confirmar Cita</span> }</button>        
+                  )}
+              </div>
+          </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+export default Stepper;
