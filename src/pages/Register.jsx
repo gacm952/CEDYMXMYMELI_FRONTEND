@@ -39,6 +39,33 @@ const Register = () => {
       const toTitleCase = input => input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
       const toLowerCaseEmail = input => input.toLowerCase();
 
+      function passwordValidation(password) {
+        const haveLetter = /[A-Za-z]/.test(password);
+        const haveNumber = /\d/.test(password);
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasSymbol = /[@$!%*?&]/.test(password);
+        const isValid = /^[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+      
+        if (!haveLetter) {
+          return "La contraseña debe contener al menos una letra.";
+        }
+        if (!haveNumber) {
+          return "La contraseña debe contener al menos un número.";
+        }
+        if (!hasUppercase) {
+          return "La contraseña debe contener al menos una mayúscula.";
+        }
+        if (!hasSymbol) {
+          return "La contraseña debe contener al menos un símbolo (@, $, !, %, *, ?, o &).";
+        }
+        if (!isValid) {
+          return "La contraseña debe ser de mínimo 8 caracteres y no contener caracteres especiales.";
+        }
+      }
+
+      const passwordError = passwordValidation(password);
+
+
       if (!roleAdmission) {
         if ([password, confirmPassword].includes('')) {
           setAlert({
@@ -56,12 +83,20 @@ const Register = () => {
           return
         }
   
-        if (password.length < 6) {
+        if (password.length < 8) {
           setAlert({
             msg: 'La contraseña es muy corta, agrega mínimo 6 caracteres',
             error: true,
           })
           return
+        }
+
+        if (passwordError) {
+          setAlert({
+            msg: passwordError,
+            error: true,
+          });
+          return;
         }
         
         if (legalTerms === false) {
@@ -498,6 +533,8 @@ const Register = () => {
                                     className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     value = {dateOfBirth}
                                     onChange = {e => setDateOfBirth(e.target.value)} 
+                                    max={new Date().toISOString().split("T")[0]} 
+                                    min={"1920-01-01"}
                                   />
                                 </div>    
 
