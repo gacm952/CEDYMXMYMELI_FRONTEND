@@ -38,7 +38,7 @@ const Login = () => {
       setAlert({
         msg: "Bienvenido/a",
         error: false
-      })    
+      }) 
 
       setTimeout(() => {
         if (data.role === "Admission") {
@@ -48,8 +48,7 @@ const Login = () => {
             navigate('/Bookings') 
           }
         }
-  
-      }, 2000);      
+      }, 1000);      
 
     } catch (error) {
       setAlert({

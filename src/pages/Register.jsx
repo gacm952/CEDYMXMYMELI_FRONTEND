@@ -85,7 +85,7 @@ const Register = () => {
   
         if (password.length < 8) {
           setAlert({
-            msg: 'La contraseña es muy corta, agrega mínimo 6 caracteres',
+            msg: 'La contraseña es muy corta, agrega mínimo 8 caracteres',
             error: true,
           })
           return
@@ -153,6 +153,13 @@ const Register = () => {
           msg: data.msg,
           error: false
         })
+
+        setTimeout(() => {
+          setAlert({})
+          if(!roleAdmission){
+            navigate("/")
+          }
+        }, 5000);
 
         // Reiniciar el formulario
 
