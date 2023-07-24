@@ -93,7 +93,7 @@ const { msg } = alert
 
             <div className="">  
                 <div className='grid grid-cols-9 mb-1 rounded gap-10 p-2 border border-gray-500'>
-                    <p className="grid items-center min-w-[500px]">
+                    <p className="grid items-center text-center">
                       {userTypeofDocument}</p>
 
                     <p className="grid items-center text-center ">

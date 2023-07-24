@@ -36,6 +36,9 @@ const Register = () => {
   const handleSubmit = async e => {
       e.preventDefault();
 
+      const toTitleCase = input => input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
+      const toLowerCaseEmail = input => input.toLowerCase();
+
       if (!roleAdmission) {
         if ([password, confirmPassword].includes('')) {
           setAlert({
@@ -71,6 +74,13 @@ const Register = () => {
         }
       }
 
+      if(document.length < 4) {
+        setAlert({
+          msg: 'El documento no puede ser muy corto',
+          error: true,
+        })
+        return
+      }
 
       if ([typeDocument, document, name,
           secondName, lastName, secondLastName, 
@@ -85,9 +95,15 @@ const Register = () => {
 
       setAlert({})
 
+      toTitleCase(name)
+      toTitleCase(secondName)
+      toTitleCase(lastName)
+      toTitleCase(secondLastName)
+      
+      toLowerCaseEmail(email)
+
       // Crear el User
        
-
       try {
        
         const { data } = await costumerAxios.post(`/register`,
@@ -133,7 +149,7 @@ const Register = () => {
 
     e.preventDefault();
 
-    if ([emailV].includes('')) {
+    if ([emailV, typeDocument2].includes('')) {
 
       setAlert2({
         msg: 'todos los campos son obligatorios',
@@ -149,8 +165,9 @@ const Register = () => {
     }
 
     const emailVerification = allUsers.some((user) => user.document === parseInt(emailV))
+    const documentTypeVerification = allUsers.some((user) => user.typeDocument === typeDocument2)
 
-      if (emailVerification && ![emailV].includes('')) {
+      if (emailVerification && documentTypeVerification) {
         setAlert2({
           msg: "SI EXISTE EL USUARIO",
           error: false
@@ -189,23 +206,24 @@ const Register = () => {
     <>
 
     {roleAdmission && (
-        <section>
+        <section className='w-full min-h-screen flex-grow flex justify-center items-center'>
                     
           <div className='grid grid-cols-2 items-center'>
 
             <div className='flex flex-col justify-center p-12 shadow-md shadow-gray-600 border-2 border-emerald-600 rounded-3xl w-96 h-82 mx-auto'>
               <h3 className='text-4xl mb-10 uppercase text-center font-extrabold font-poppins text-gray-900'>Verificador de Usuarios</h3>
               <form onSubmit={handleSubmitVerificar}>
-                <div className='flex gap-4'>
+                <div className='flex gap-2'>
 
-                <div className='flex-1 mb-2 hidden'>
+                <div className='flex-[33%] mt-0.5'>
                                 <select
                                   id="emailV"
                                   className="text-center font-bold shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                   value={typeDocument2}
                                   onChange={e => setTypeDocument2(e.target.value)}
     
-                                >
+                                >🡣
+                                  <option value="" hidden >🡣</option>
                                   <option value="CC">CC</option>
                                   <option value="TI">TI</option>
                                   <option value="RUT">RUT</option>
@@ -221,7 +239,7 @@ const Register = () => {
                                 </select>
                 </div>
 
-                <div className=''>
+                <div>
                 
                   <input
                     autoComplete="on"
@@ -263,7 +281,7 @@ const Register = () => {
                             
                               <div className=''>
                                 <label htmlFor="documento" className="block font-semibold font text-gray-700">
-                                Tipo de Documento
+                                Tipo de Documento 
                                 </label>
                                 <select
                                   id="documento"

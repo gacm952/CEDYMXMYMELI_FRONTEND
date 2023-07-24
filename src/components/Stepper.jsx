@@ -31,15 +31,18 @@ const Stepper = () => {
   const [showCitaValorativa, setShowCitaValorativa] = useState(false);
   const [userFoundNames, setUserFoundNames] = useState(''); 
 
-  console.log(userFoundNames)
-
   const navigate = useNavigate();
   const params = useParams()
-  const { allBookings, submitBooking } = useBookings();
+  const { allBookings, submitBooking, bookings } = useBookings();
   const { auth, allUsers } = useAuth();
   const roleUser = [auth].some((role) => role.role === "User")
   const isResponsable = [auth].some((role) => role.responsable === true)
   const bookingData = allBookings.find(booking => booking._id === params.id) 
+  const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
+
+  const haveMotivePG = bookingAuth.some(booking => booking.Motive === "Psicologia Primera vez") ? "Particular" : "Nuevo paciente"; 
+
+  console.log(bookingAuth)
 
   useEffect(() => {
     if (params.id) {
@@ -180,13 +183,37 @@ const Stepper = () => {
     dateHour.setHours(selectedTime.getHours());
     dateHour.setMinutes(selectedTime.getMinutes());
 
+    const haveMotiveNutri = bookingAuth.some(booking => booking.Motive === "Nutricion Primera vez");
+    const haveMotiveMI = bookingAuth.some(booking => booking.Motive === "Medicina Interna Primera vez");
+    const haveMotiveMIG = bookingAuth.some(booking => booking.Motive === "Medicina Integral Primera vez");
+    const haveMotivePG = bookingAuth.some(booking => booking.Motive === "Psicologia Primera vez");
+    const haveMotiveCV = bookingAuth.some(booking => booking.Motive === "Cita Valorativa Primera vez");
+
     const formattedDateHour = format(dateHour, 'dd/MM/yyyy HH:mm:ss');
+    
+    // Determinar el valor adecuado para la propiedad Motive
+    let updatedMotive;
+
+    if (haveMotiveNutri && Motive === "Nutricion Primera vez") {
+      updatedMotive = "Nutricion Control";
+    } else if (haveMotiveMI && Motive === "Medicina Interna Primera vez") {
+      updatedMotive = "Medicina Interna Control";
+    } else if (haveMotiveMIG && Motive === "Medicina Integral Primera vez") {
+      updatedMotive = "Medicina Integral Control";
+    } else if (haveMotivePG && Motive === "Psicologia Primera vez") {
+      updatedMotive = "Psicologia Control";
+    } else if (haveMotiveCV && Motive === "Cita Valorativa Primera vez") {
+      updatedMotive = "Cita Valorativa Control";
+    } else {     
+        // Si no tiene ninguna cita en ninguna especialidad, entonces mostrar "Nuevo Paciente" para la especialidad actual
+        updatedMotive = `${Motive}`;   
+    }
 
     const target = bookingData?.bookingTo || bookingData?.bookingFor || auth._id
 
     // Pasar los datos hacia el provider
 
-    submitBooking({id, dateHour, Type, subType, Motive, bookingTo: foundUserId }, 
+    submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId }, 
                   {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
     
     setAlert({
@@ -398,10 +425,10 @@ const Stepper = () => {
                         {showCitaValorativa && (
                         <option value="Cita Valorativa">Cita Valorativa</option>
                         )}
-                        <option value="Nutricion">Nutrición</option>
-                        <option value="Medicina Interna">Medicina Interna</option>
-                        <option value="Medicina Interna">Medicina Integral</option>
-                        <option value="Obesidad">Psicología</option>
+                        <option value="Nutricion Primera vez">Nutrición</option>
+                        <option value="Medicina Interna Primera vez">Medicina Interna</option>
+                        <option value="Medicina Integral Primera vez">Medicina Integral</option>
+                        <option value="Psicologia Primera vez">Psicología</option>
                     </select>
                 </div>
 
@@ -426,7 +453,7 @@ const Stepper = () => {
             {userData.Type === "EPS" && (
             <p>EPS: <span className='font-semibold'> {userData.subType}</span></p>
             )}            
-            <p>Motivo: <span className='font-semibold'>{userData.Motive}</span> </p>
+            <p>Motivo: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
             <p>Fecha Seleccionada: <span className='font-semibold'>{selectedDate?.toLocaleDateString()}</span> </p>
             <p>Hora Seleccionada: <span className='font-semibold'>{selectedTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> </p>
           </div>
