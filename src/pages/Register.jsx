@@ -130,6 +130,42 @@ const Register = () => {
 
       const isDocumentValid = /^\d+$/.test(document);
       const isPhoneNumberValid = /^\d+$/.test(phoneNumber);
+      const isNameValid = /^[A-Za-z]+$/.test(name);
+      const isSecondNameValid = /^[A-Za-z]+$/.test(secondName);
+      const isLastNameValid = /^[A-Za-z]+$/.test(lastName);
+      const isSecondLastNameValid = /^[A-Za-z]+$/.test(secondLastName);
+
+      if (!isNameValid) {
+        setAlert({
+          msg: 'El campo "Nombre" debe contener solo letras.',
+          error: true,
+        });
+        return;
+      }
+      
+      if (!isSecondNameValid) {
+        setAlert({
+          msg: 'El campo "Segundo Nombre" debe contener solo letras.',
+          error: true,
+        });
+        return;
+      }
+      
+      if (!isLastNameValid) {
+        setAlert({
+          msg: 'El campo "Apellido" debe contener solo letras.',
+          error: true,
+        });
+        return;
+      }
+      
+      if (!isSecondLastNameValid) {
+        setAlert({
+          msg: 'El campo "Segundo Apellido" debe contener solo letras.',
+          error: true,
+        });
+        return;
+      }
 
       if (!isDocumentValid) {
         setAlert({
@@ -146,6 +182,7 @@ const Register = () => {
         });
         return;
       }
+
 
       setAlert({})
 
@@ -562,8 +599,8 @@ const Register = () => {
                                     className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     value = {dateOfBirth}
                                     onChange = {e => setDateOfBirth(e.target.value)} 
-                                    max={"2023-07-23"} 
-                                    min={"1920-01-01"}
+                                    min={"1925-01-01"}
+                                    max={new Date().toISOString().split('T')[0]}
                                   />
                                 </div>    
 
@@ -867,6 +904,8 @@ const Register = () => {
                                     className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     value = {dateOfBirth}
                                     onChange = {e => setDateOfBirth(e.target.value)} 
+                                    min={"1925-01-01"}
+                                    max={new Date().toISOString().split('T')[0]}
                                   />
                                 </div>    
 
