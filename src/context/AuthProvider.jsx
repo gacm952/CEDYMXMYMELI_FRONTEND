@@ -1,4 +1,5 @@
 import { useState, useEffect, createContext } from "react";
+import { useNavigate } from "react-router-dom";
 import costumerAxios from "../config/costumerAxios";
 
 const AuthContext = createContext();
@@ -8,6 +9,9 @@ const AuthProvider = ({children}) => {
     const [auth, setAuth] = useState({})
     const [allUsers, setAllUsers] = useState({})
     const [loading, setLoading] =useState(true)
+    const navigate = useNavigate()
+    const isAdmission = auth.role === "Admission"
+    const isUser = auth.role === "User"
 
     useEffect(() => {     
         const AuthUser = async () => {
@@ -29,7 +33,7 @@ const AuthProvider = ({children}) => {
                 const { data } = await costumerAxios('/profile', config)
 
                 setAuth(data)
-
+              
             } catch (error) {
                 console.log(error)
             } 
@@ -70,6 +74,14 @@ const AuthProvider = ({children}) => {
         };
         fetchUsers()
     }, [])
+
+    useEffect(() => {
+        if (!loading && auth && isAdmission) {
+          navigate('/cedym_system'); 
+        } else if (!loading && auth && isUser) {
+          navigate('/Bookings'); 
+        }
+      }, [loading, auth, isAdmission]);
 
     const submitResposable = async (userID, dataAction) => {
         try {

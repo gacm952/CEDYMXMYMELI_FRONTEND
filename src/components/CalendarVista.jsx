@@ -29,8 +29,8 @@ const CalendarVista = ({ value, onChange }) => {
       <DatePicker 
         value={value}
         onChange={handleDateChange}
-        shouldDisableDate={shouldDisableDate}
-        disablePast
+        //shouldDisableDate={shouldDisableDate}
+        //disablePast
         className='w-40'
       />
     </LocalizationProvider>

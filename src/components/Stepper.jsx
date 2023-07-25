@@ -40,10 +40,6 @@ const Stepper = () => {
   const bookingData = allBookings.find(booking => booking._id === params.id) 
   const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
 
-  const haveMotivePG = bookingAuth.some(booking => booking.Motive === "Psicologia Primera vez") ? "Particular" : "Nuevo paciente"; 
-
-  console.log(bookingAuth)
-
   useEffect(() => {
     if (params.id) {
       setId(params.id);

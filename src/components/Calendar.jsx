@@ -6,6 +6,7 @@ import { DigitalClock } from '@mui/x-date-pickers/DigitalClock';
 import { isWeekend, setDefaultOptions } from 'date-fns';
 import { es } from 'date-fns/locale';
 import BookingContext from '../context/BookingProvider';
+import fc from 'festivos-colombia';
 
 function Calendar({ onDateChange, onTimeChange }) {
 
@@ -16,7 +17,11 @@ function Calendar({ onDateChange, onTimeChange }) {
   const { dateFromBackend } = useContext(BookingContext);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  console.log(dateFromBackend)
+  const getColombiaHolidays = (year) => {
+    return fc.getHolidaysByYear(year)
+      .filter((holiday) => holiday.static)
+      .map((holiday) => new Date(holiday.date));
+  };
 
   useEffect(() => {
     if (dateFromBackend) {
@@ -95,11 +100,15 @@ function Calendar({ onDateChange, onTimeChange }) {
 
    const currentDate = new Date();
    const isSameDate = date.toDateString() === currentDate.toDateString();
+
+   // Verificar si la fecha es un día feriado en Colombia
+  const colombiaHolidays = getColombiaHolidays(date.getFullYear());
+  const isHoliday = colombiaHolidays.some((holiday) => holiday.toDateString() === date.toDateString());
  
    // Lógica para determinar si la fecha está deshabilitada
 
-   const isDisabled = isWeekend(date) || isAllTimesSelected || isSameDate;
- 
+   const isDisabled = isWeekend(date) || isAllTimesSelected || isSameDate || isHoliday;
+    
    return isDisabled;
  };
 
