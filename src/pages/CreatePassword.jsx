@@ -32,9 +32,9 @@ const CreatePassword = () => {
   const handleSubmit = async e => {
     e.preventDefault();
 
-    if(password.length < 6) {
+    if(password.length < 8) {
       setAlert({
-        msg: 'La contraseña debe ser mínimo de 6 caracteres',
+        msg: 'La contraseña debe ser mínimo de 8 caracteres',
         error: true
       })
       return
@@ -49,7 +49,7 @@ const CreatePassword = () => {
     }
 
     try {
-      const url = `/resetpassword/${token}`
+      const url = `/createpassword/${token}`
 
       const { data } = await costumerAxios.post(url, { password })
       setAlert({
