@@ -128,24 +128,46 @@ const Register = () => {
         return 
       }
 
-      setAlert({})
+      const isDocumentValid = /^\d+$/.test(document);
+      const isPhoneNumberValid = /^\d+$/.test(phoneNumber);
 
-      toTitleCase(name)
-      toTitleCase(secondName)
-      toTitleCase(lastName)
-      toTitleCase(secondLastName)
+      if (!isDocumentValid) {
+        setAlert({
+          msg: 'El campo "Documento" debe contener solo números.',
+          error: true,
+        });
+        return;
+      }
       
-      toLowerCaseEmail(email)
+      if (!isPhoneNumberValid) {
+        setAlert({
+          msg: 'El campo "Número de teléfono" debe contener solo números.',
+          error: true,
+        });
+        return;
+      }
+
+      setAlert({})
 
       // Crear el User
        
       try {
        
         const { data } = await costumerAxios.post(`/register`,
-          {password, typeDocument, document, name,
-          secondName, lastName, secondLastName, 
-          email, phoneNumber, address, dateOfBirth, 
-          civilStatus, typeOfBlood, registeredBy: auth._id }) 
+        { password, 
+          typeDocument, 
+          document, 
+          name: toTitleCase(name),
+          secondName: toTitleCase(secondName),
+          lastName: toTitleCase(lastName),
+          secondLastName: toTitleCase(secondLastName),
+          email: toLowerCaseEmail(email),
+          phoneNumber, 
+          address, 
+          dateOfBirth, 
+          civilStatus, 
+          typeOfBlood, 
+          registeredBy: auth._id }) 
 
         await costumerAxios.post('/updateaction', {realizedBy: auth._id })
 
