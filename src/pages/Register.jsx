@@ -335,7 +335,7 @@ const Register = () => {
                                   <option value="PPT">PPT</option>
                                   <option value="P">P</option>
                                   <option value="LM">LM</option>
-                                  <option value="EX">EX</option>
+                                  <option value="ESI">EX</option>
 
                                 </select>
                 </div>
@@ -392,17 +392,17 @@ const Register = () => {
     
                                 >
                                   <option value="" hidden>Tipo de Documento</option>
-                                  <option value="Cédula de Ciudadanía">Cédula de Ciudadanía</option>
-                                  <option value="Tarjeta de Identidad">Tarjeta de Identidad</option>
-                                  <option value="Registro Único Tributario">Registro Único Tributario</option>
-                                  <option value="Cédula de Extranjería">Cédula de Extranjería</option>
-                                  <option value="Registro Civil de Nacimiento">Registro Civil de Nacimiento</option>
-                                  <option value="Numero de Identificación Tributaria">Numero de Identificación Tributaria</option>
-                                  <option value="Permiso Especial de Permanencia">Permiso Especial de Permanencia</option>
-                                  <option value="Permiso de Protección Temporal">Permiso de Protección Temporal</option>
-                                  <option value="Pasaporte">Pasaporte</option>
-                                  <option value="Libreta Militar">Libreta Militar</option>
-                                  <option value="Extranjero Sin Identificación">Extranjero Sin Identificación</option>
+                                  <option value="CC">Cédula de Ciudadanía</option>
+                                  <option value="TI">Tarjeta de Identidad</option>
+                                  <option value="RUT">Registro Único Tributario</option>
+                                  <option value="CE">Cédula de Extranjería</option>
+                                  <option value="RCN">Registro Civil de Nacimiento</option>
+                                  <option value="NIT">Numero de Identificación Tributaria</option>
+                                  <option value="PEP">Permiso Especial de Permanencia</option>
+                                  <option value="PPT">Permiso de Protección Temporal</option>
+                                  <option value="P">Pasaporte</option>
+                                  <option value="LM">Libreta Militar</option>
+                                  <option value="ESI">Extranjero Sin Identificación</option>
 
                                 </select>
                               </div>
@@ -696,18 +696,18 @@ const Register = () => {
                                   onChange={e => setTypeDocument(e.target.value)}
     
                                 >
-                                  <option value="" hidden>Tipo de Documento</option>
-                                  <option value="Cédula de Ciudadanía">Cédula de Ciudadanía</option>
-                                  <option value="Tarjeta de Identidad">Tarjeta de Identidad</option>
-                                  <option value="Registro Único Tributario">Registro Único Tributario</option>
-                                  <option value="Cédula de Extranjería">Cédula de Extranjería</option>
-                                  <option value="Registro Civil de Nacimiento">Registro Civil de Nacimiento</option>
-                                  <option value="Numero de Identificación Tributaria">Numero de Identificación Tributaria</option>
-                                  <option value="Permiso Especial de Permanencia">Permiso Especial de Permanencia</option>
-                                  <option value="Permiso de Protección Temporal">Permiso de Protección Temporal</option>
-                                  <option value="Pasaporte">Pasaporte</option>
-                                  <option value="Libreta Militar">Libreta Militar</option>
-                                  <option value="Extranjero Sin Identificación">Extranjero Sin Identificación</option>
+                                    <option value="" hidden>Tipo de Documento</option>
+                                  <option value="CC">Cédula de Ciudadanía</option>
+                                  <option value="TI">Tarjeta de Identidad</option>
+                                  <option value="RUT">Registro Único Tributario</option>
+                                  <option value="CE">Cédula de Extranjería</option>
+                                  <option value="RCN">Registro Civil de Nacimiento</option>
+                                  <option value="NIT">Numero de Identificación Tributaria</option>
+                                  <option value="PEP">Permiso Especial de Permanencia</option>
+                                  <option value="PPT">Permiso de Protección Temporal</option>
+                                  <option value="P">Pasaporte</option>
+                                  <option value="LM">Libreta Militar</option>
+                                  <option value="ESI">Extranjero Sin Identificación</option>
 
                                 </select>
                               </div>
