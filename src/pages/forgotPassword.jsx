@@ -6,7 +6,7 @@ import Alert from "../components/Alert"
 const ForgotPassword = () => {
 
   const [email, setEmail] = useState('')
-
+  const [emailSent, setEmailSent] = useState(false)
   const [alert, setAlert] = useState({})
 
   const handleSubmit = async e => {
@@ -27,6 +27,12 @@ const ForgotPassword = () => {
         error: false
       })
 
+      setTimeout(() => {
+        setAlert({})
+      }, 3000);
+
+      setEmailSent(true)
+
     } catch (error) {
       setAlert({
         msg: error.response.data.msg,
@@ -43,11 +49,12 @@ const ForgotPassword = () => {
       <div className="flex justify-center mx-auto max-w-screen-xl px-4 pb-8 pt-20 sm:px-6 lg:px-8">      
           <div className="max-w-xl shadow-md bg-white shadow-gray-600 border-2 border-emerald-600 rounded-3xl">
             <div className="p-8 sm:p-32 lg:py-40 lg:px-16 lg:my-12">
-                 <h2 className="text-4xl font-extrabold sm:text-5xl font-poppins text-gray-900 mb-12 capitalize">Recupera tu contraseña
+                 <h2 className="text-center text-4xl font-extrabold sm:text-5xl font-poppins text-gray-900 mb-12 capitalize">Recupera tu contraseña
               </h2>
 
               {msg && <Alert alert={alert}/> }
 
+              {!emailSent && (
               <div className="mt-6 font-poppins">
                   <form onSubmit={handleSubmit} className="space-y-1">
                       <div>
@@ -79,6 +86,12 @@ const ForgotPassword = () => {
                       <Link to="/Register" className="font-medium text-emerald-600 hover:text-emerald-500 ">Regístrate </Link></p>
                   </nav>
               </div>
+              )}
+
+              {emailSent && (
+                <p className='text-2xl shadow-md text-white bg-emerald-700 shadow-gray-600 border-2 border-emerald-600 rounded-3xl p-4 text-center font-extrabold font-poppins mb-12'>Correo enviado, por favor revisa tu bandeja de entrada y sigue los pasos indicados.</p>
+              )}
+              
             </div>
           </div>
       </div>

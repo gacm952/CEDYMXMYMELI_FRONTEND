@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, useParams } from 'react-router-dom'
 import costumerAxios from "../config/costumerAxios"
 import Alert from "../components/Alert"
+import { useNavigate } from "react-router-dom"
 
 const CreatePassword = () => {
 
@@ -11,6 +12,7 @@ const CreatePassword = () => {
   const [tokenValid, setTokenValid] = useState(false)
   const [changedPassword, setChangedPassword] = useState(false)
   const params = useParams()
+  const navigate = useNavigate()
   const {token} = params
 
   useEffect(() => {
@@ -92,6 +94,10 @@ const CreatePassword = () => {
       })
 
       setChangedPassword(true)
+
+      setTimeout(() => {
+        navigate("/")
+      }, 3000);
 
     } catch (error) {
       setAlert({
