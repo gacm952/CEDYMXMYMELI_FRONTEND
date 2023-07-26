@@ -65,7 +65,6 @@ const Register = () => {
 
       const passwordError = passwordValidation(password);
 
-
       if (!roleAdmission) {
         if ([password, confirmPassword].includes('')) {
           setAlert({

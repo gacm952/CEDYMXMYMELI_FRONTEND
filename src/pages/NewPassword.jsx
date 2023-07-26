@@ -29,6 +29,30 @@ const NewPassword = () => {
     checkToken()
   }, [])
 
+  function passwordValidation(password) {
+    const haveLetter = /[A-Za-z]/.test(password);
+    const haveNumber = /\d/.test(password);
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasSymbol = /[@$!%*?&]/.test(password);
+    const isValid = /^[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+  
+    if (!haveLetter) {
+      return "La contraseña debe contener al menos una letra.";
+    }
+    if (!haveNumber) {
+      return "La contraseña debe contener al menos un número.";
+    }
+    if (!hasUppercase) {
+      return "La contraseña debe contener al menos una mayúscula.";
+    }
+    if (!hasSymbol) {
+      return "La contraseña debe contener al menos un símbolo (@, $, !, %, *, ?, o &).";
+    }
+    if (!isValid) {
+      return "La contraseña debe ser de mínimo 8 caracteres y no contener caracteres especiales.";
+    }
+  }
+
   const handleSubmit = async e => {
     e.preventDefault();
 
@@ -46,6 +70,16 @@ const NewPassword = () => {
         error: true
       })
       return
+    }
+
+    const passwordError = passwordValidation(password);
+
+    if (passwordError) {
+      setAlert({
+        msg: passwordError,
+        error: true,
+      });
+      return;
     }
 
     try {
