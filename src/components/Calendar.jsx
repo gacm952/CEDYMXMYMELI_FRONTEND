@@ -98,8 +98,8 @@ function Calendar({ onDateChange, onTimeChange }) {
 
    // No se pueda agendar para el mismo dia
 
-   const currentDate = new Date();
-   const isSameDate = date.toDateString() === currentDate.toDateString();
+  // const currentDate = new Date();
+  // const isSameDate = date.toDateString() === currentDate.toDateString();
 
    // Verificar si la fecha es un día feriado en Colombia
   const colombiaHolidays = getColombiaHolidays(date.getFullYear());
@@ -107,7 +107,7 @@ function Calendar({ onDateChange, onTimeChange }) {
  
    // Lógica para determinar si la fecha está deshabilitada
 
-   const isDisabled = isWeekend(date) || isAllTimesSelected || isSameDate || isHoliday;
+   const isDisabled = isWeekend(date) || isAllTimesSelected || isHoliday;
     
    return isDisabled;
  };
