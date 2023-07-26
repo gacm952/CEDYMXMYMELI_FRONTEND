@@ -205,7 +205,7 @@ const Register = () => {
           typeOfBlood, 
           registeredBy: auth._id }) 
 
-        await costumerAxios.post('/updateaction', {realizedBy: auth._id })
+        await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document })
 
         setAlert({
           msg: data.msg,

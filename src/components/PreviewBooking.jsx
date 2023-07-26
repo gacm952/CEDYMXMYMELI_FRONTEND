@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom"
-import { parseISO, format, set } from "date-fns";
+import useAuth from "../hooks/useAuth";
+import { parseISO, format } from "date-fns";
 import useBookings from "../hooks/useBookings";
 import Alert from "./Alert";
 import { useState } from "react";
@@ -10,6 +11,7 @@ const { Motive, Type, subType, dateHour, _id } = booking
 const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 const { deleteBooking } = useBookings();
 const [alert, setAlert] = useState({});
+const { auth } = useAuth()
 const navigate = useNavigate()
 
 const parseDate = parseISO(dateHour);
@@ -18,7 +20,7 @@ const formattedHour = format(parseDate, 'HH:mm');
 
 const handleClick = () => {
     if(confirm("¿Deseas cancelar la cita?")) {
-      deleteBooking(_id) 
+      deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`}) 
 
         setAlert({
           msg: "Cita cancelada exitosamente",

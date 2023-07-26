@@ -29,7 +29,9 @@ const Stepper = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
   const [showCitaValorativa, setShowCitaValorativa] = useState(false);
+  const [isVisitadorMedico, setIsVisitadorMedico] = useState(false);
   const [userFoundNames, setUserFoundNames] = useState(''); 
+  const [typeDocument, setTypeDocument] = useState('');
 
   const navigate = useNavigate();
   const params = useParams()
@@ -70,11 +72,15 @@ const Stepper = () => {
   }, [foundUserId]);
 
   useEffect(() => {
-    // Verificar si userData.Type es igual a "Particular"
     if (userData.Type === "Particular") {
       setShowCitaValorativa(true);
     } else {
       setShowCitaValorativa(false);
+    }
+    if (userData.Type === "Visitador Médico") {
+      setIsVisitadorMedico(true);
+    } else {
+      setIsVisitadorMedico(false);
     }
   }, [userData.Type]);
 
@@ -184,6 +190,8 @@ const Stepper = () => {
     const haveMotiveMIG = bookingAuth.some(booking => booking.Motive === "Medicina Integral Primera vez");
     const haveMotivePG = bookingAuth.some(booking => booking.Motive === "Psicologia Primera vez");
     const haveMotiveCV = bookingAuth.some(booking => booking.Motive === "Cita Valorativa Primera vez");
+    const haveMotiveMG = bookingAuth.some(booking => booking.Motive === "Medicina General Primera vez");
+    const haveMotiveG = bookingAuth.some(booking => booking.Motive === "Ginecologia Primera vez");
 
     const formattedDateHour = format(dateHour, 'dd/MM/yyyy HH:mm:ss');
     
@@ -200,6 +208,10 @@ const Stepper = () => {
       updatedMotive = "Psicologia Control";
     } else if (haveMotiveCV && Motive === "Cita Valorativa Primera vez") {
       updatedMotive = "Cita Valorativa Control";
+    } else if (haveMotiveMG && Motive === "Medicina General Primera vez") {
+      updatedMotive = "Medicina General Control";
+    } else if (haveMotiveG && Motive === "Ginecologia Primera vez") {
+      updatedMotive = "Ginecologia Control";
     } else {     
         // Si no tiene ninguna cita en ninguna especialidad, entonces mostrar "Nuevo Paciente" para la especialidad actual
         updatedMotive = `${Motive}`;   
@@ -227,7 +239,7 @@ const Stepper = () => {
 
     const found = allUsers.find(user => user.document === parseInt(searchEmail));
 
-    const userFoundNames =  `${found.name} ${found.lastName}`
+    const userFoundNames =  `Nombre: ${found.name} ${found.secondName} ${found.lastName} ${found.secondLastName} ${found.typeDocument}: ${found.document}`
     
       if (found) {
         
@@ -271,29 +283,59 @@ const Stepper = () => {
             <form className='max-w-screen-md mx-auto'>
 
               {(!roleUser && !params.id) && (  <div className='flex flex-col my-4'>
-                  <label
-                          className="inline-flex mb-2 text-sm text-gray-800"
-                          htmlFor='' 
-                        >Ingresa el Documento del Paciente </label>
-                     
-                      <input 
-                       type="search"   
-                       placeholder='Buscar Cédula'
-                       className='w-full
-                              px-3
-                              py-2
-                              text-gray-800
-                              border
-                              rounded
-                              outline-none
-                              bg-gray-50
-                              focus:ring
-                              ring-emerald-500
-                              mb-4
-                              ' 
-                        value={searchEmail}
-                        onChange={e => setSearchEmail(e.target.value)}>
-                     </input>
+                    <div className='flex gap-2'>
+                      <div className='flex-[1%] mt-8'>
+                                      <select
+                                        id="emailV"
+                                        className="text-center font-bold shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value={typeDocument}
+                                        onChange={e => setTypeDocument(e.target.value)}
+          
+                                      >🡣
+                                        <option value="" hidden >🡣</option>
+                                        <option value="CC">CC</option>
+                                        <option value="TI">TI</option>
+                                        <option value="RUT">RUT</option>
+                                        <option value="CE">CE</option>
+                                        <option value="RCN">RCN</option>
+                                        <option value="NIT">NIT</option>
+                                        <option value="PEP">PEP</option>
+                                        <option value="PPT">PPT</option>
+                                        <option value="P">P</option>
+                                        <option value="LM">LM</option>
+                                        <option value="ESI">EX</option>
+
+                                      </select>
+                      </div>
+
+                      <div className='flex-[80%] flex-col'>
+                
+                        <label
+                            className="inline-flex mb-2 text-sm text-gray-800"
+                            htmlFor='' 
+                          >Ingresa el Documento del Paciente </label>
+                      
+                        <input 
+                        type="search"   
+                        placeholder='Buscar Documento'
+                        className='w-full
+                                px-3
+                                py-2
+                                text-gray-800
+                                border
+                                rounded
+                                outline-none
+                                bg-gray-50
+                                focus:ring
+                                ring-emerald-500
+                                mb-4
+                                ' 
+                          value={searchEmail}
+                          onChange={e => setSearchEmail(e.target.value)}>
+                        </input>
+                      </div>
+                    </div>
+
                      <div className='flex justify-end'>
                     <button className='  
                     px-12
@@ -360,7 +402,6 @@ const Stepper = () => {
                         onChange={handleUserDataChange}
                     >
                         <option value="" hidden>Selecciona una opción</option>
-                        <option value="Sanitas">Sanitas</option>
                         <option value="Nueva EPS">Nueva EPS</option>
                     </select>
                 </div>
@@ -385,11 +426,8 @@ const Stepper = () => {
                     >
                         <option value="" hidden>Selecciona una opción</option>
                         <option value="SURA">SURA</option>
-                        <option value="Coomeva">Coomeva</option>
+                        <option value="RedMedical">RedMedical</option>
                         <option value="MediGold">MediGold</option>
-                        <option value="Seguros Bolivar">Seguros Bolivar</option>
-                        <option value="Allianz">Allianz</option>
-                        <option value="Sanitas Premiun">Sanitas Premiun</option>
                     </select>
                 </div>
               )}
@@ -419,7 +457,13 @@ const Stepper = () => {
                     >
                         <option value="" hidden>Selecciona Una Opción</option>
                         {showCitaValorativa && (
-                        <option value="Cita Valorativa">Cita Valorativa</option>
+                        <option value="Cita Valorativa Primera vez">Cita Valorativa</option>
+                        )}
+                        {!isVisitadorMedico && (
+                          <option value="Medicina General Primera vez">Medicina General</option>
+                        )}
+                         {!isVisitadorMedico && (
+                          <option value="Ginecologia Primera vez">Ginecología </option>
                         )}
                         <option value="Nutricion Primera vez">Nutrición</option>
                         <option value="Medicina Interna Primera vez">Medicina Interna</option>
