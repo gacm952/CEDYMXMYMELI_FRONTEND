@@ -61,12 +61,12 @@ const ForgotPassword = () => {
                         <label 
                           htmlFor="email" 
                           className="block font-medium text-gray-700 mt-2 lg:mt-0">
-                          Correo electrónico
+                          Correo Electrónico
                         </label>
                         <input 
                           id='email'
                           type="email"
-                          placeholder="Correo electrónico"
+                          placeholder="Correo Electrónico"
                           className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                           value={email}
                           onChange={e => setEmail(e.target.value)}
@@ -78,12 +78,15 @@ const ForgotPassword = () => {
                     </button>
                   </div>
                   </form>
-                   <nav className="lg:flex lg:justify-between mt-12" >
-                    <p className="lg:mt-8 text-sm text-grey-600 text-center">¿Ya tienes una cuenta?
-                          <Link to="/" className="font-medium text-emerald-600 hover:text-emerald-500">Inicia sesión</Link></p>
-
-                    <p className="lg:mt-8 text-sm text-grey-600 text-center">¿No tienes una cuenta?
-                      <Link to="/Register" className="font-medium text-emerald-600 hover:text-emerald-500 ">Regístrate </Link></p>
+                  <nav className="lg:flex lg:justify-between mt-12" >
+                          <div className='flex justify-center flex-col text-center mb-2'>
+                    <p className="lg:mt-8 text-sm text-grey-600 text-center">¿Ya tienes una cuenta?</p>
+                    <Link to="/" className="font-medium text-sm text-emerald-600 hover:text-emerald-500">Inicia sesión</Link>
+                          </div>
+                          <div className='flex justify-center flex-col text-center mb-2'>
+                    <p className="lg:mt-8 text-sm text-grey-600 text-center">¿No tienes una cuenta?</p>
+                    <Link to="/Register" className="font-medium text-sm text-emerald-600 hover:text-emerald-500 ">Regístrate </Link>
+                          </div>
                   </nav>
               </div>
               )}

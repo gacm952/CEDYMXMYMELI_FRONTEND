@@ -239,9 +239,11 @@ const Stepper = () => {
 
     const found = allUsers.find(user => user.document === parseInt(searchEmail));
 
+    const documentTypeVerification = allUsers.some((user) => user.typeDocument === typeDocument)
+
     const userFoundNames =  `Nombre: ${found.name} ${found.secondName} ${found.lastName} ${found.secondLastName} ${found.typeDocument}: ${found.document}`
     
-      if (found) {
+      if (found && documentTypeVerification) {
         
         setFoundUserId(found._id);
 
@@ -438,7 +440,8 @@ const Stepper = () => {
                     <label className="inline-flex mb-2 text-sm text-gray-800">
                         Selecciona el Tipo de Cita
                     </label>
-                    <select
+                    {!isVisitadorMedico && (
+                      <select
                         className="
                         w-full
                         px-3
@@ -470,6 +473,42 @@ const Stepper = () => {
                         <option value="Medicina Integral Primera vez">Medicina Integral</option>
                         <option value="Psicologia Primera vez">Psicología</option>
                     </select>
+                    )}
+
+                    {isVisitadorMedico && ( 
+                    <select
+                        className="
+                        w-full
+                        px-3
+                        py-2
+                        text-gray-800
+                        border
+                        rounded
+                        outline-none
+                        bg-gray-50
+                        focus:ring
+                        ring-emerald-500
+                        "
+                        name="Motive" // Nombre del campo relacionado en el estado userData
+                        value={userData.Motive || ''}
+                        onChange={handleUserDataChange}
+                    >
+                        <option value="" hidden>Selecciona Una Opción</option>
+                        <option value="Toma de Muestras">Entrega de Muestras</option>
+                        <option value="Presentación de Nuevos Productos">Presentación de Nuevos Productos</option>
+                        <option value="Actualización de Información Científica">Actualización de Información Científica</option>
+                        <option value="Recopilación de Datos y Feedback">Recopilación de Datos y Feedback</option>
+                        <option value="Seguimiento de Pacientes">Seguimiento de Pacientes</option>
+                        <option value="Organización de Eventos y Simposios">Organización de Eventos y Simposios</option>
+                        <option value="Promoción de Programas de Apoyo">Promoción de Programas de Apoyo</option>
+                        <option value="Colaboración en Investigaciones">Colaboración en Investigaciones</option>
+                        <option value="Conocer las Necesidades del Médico">Conocer las Necesidades del Médico</option>
+                        <option value="Demostración de Técnicas o Procedimientos">Demostración de Técnicas o Procedimientos</option>
+                        <option value="Otro">Otro</option>
+
+                    </select>
+                    )}
+                    
                 </div>
 
 
