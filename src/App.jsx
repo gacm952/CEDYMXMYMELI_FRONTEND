@@ -19,6 +19,7 @@ import Vista from "./pages/Vista.jsx";
 import MenuAdmission from "./pages/MenuAdmission.jsx";
 import RebookingMassively from "./pages/RebookingMassively.jsx";
 import CreatePassword from "./pages/CreatePassword.jsx"; 
+import ConfirmBooking from "./pages/ConfirmBooking.jsx";
 
 import { AuthProvider } from './context/AuthProvider.jsx'
 import { BookingProvider } from './context/BookingProvider.jsx'
@@ -55,6 +56,7 @@ function App() {
               <Route path="editBooking" element={<EditBooking/>} />
               <Route path="editBooking/:id" element={<EditingBooking/>} />
               <Route path="rebooking" element={<RebookingMassively/>} />
+              <Route path="confirmBooking/:id" element={<ConfirmBooking/>} />
             </Route>
           </Routes>
         </BookingProvider>

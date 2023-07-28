@@ -108,16 +108,16 @@ const RebookingMassively = () => {
 
   const userDataFromBooking = selectedBookings.map(booking => booking.bookingTo || booking.bookingFor);
   const usersId = allUsers.map(user => user._id)
-  const startTime = new Date(dateRangeStart.getFullYear(), dateRangeStart.getMonth(), dateRangeStart.getDate(), timeRangeStart.getHours(), timeRangeStart.getMinutes());
-  const endTime = new Date(timeRangeEnd.getFullYear(), timeRangeEnd.getMonth(), timeRangeEnd.getDate(), timeRangeEnd.getHours(), timeRangeEnd.getMinutes());
+  const startTime = timeRangeStart ? new Date(dateRangeStart.getFullYear(), dateRangeStart.getMonth(), dateRangeStart.getDate(), timeRangeStart.getHours(), timeRangeStart.getMinutes()) : null;
+  const endTime = timeRangeEnd ? new Date(timeRangeEnd.getFullYear(), timeRangeEnd.getMonth(), timeRangeEnd.getDate(), timeRangeEnd.getHours(), timeRangeEnd.getMinutes()) : null;
 
   // Utilizamos el método filter para obtener los IDs que coinciden en ambos arrays
   // const matchingIds = usersId.filter(id => userDataFromBooking.includes(id));
 
   const formattedDateStart = format(dateRangeStart, 'd MMMM yyyy');
   const formattedDateEnd = format(dateRangeEnd, 'd MMMM yyyy');
-  const formattedHourStart = format(startTime, 'HH:mm');
-  const formattedHourEnd = format(endTime, 'HH:mm');
+  const formattedHourStart = timeRangeStart ? format(startTime, 'HH:mm') : '';
+  const formattedHourEnd = timeRangeEnd ? format(endTime, 'HH:mm') : '';
 
   massiveReBooking(ids, newDateHours, {realizedBy: auth._id, Action: `Se cerró la agenda desde ${formattedDateStart} ${formattedHourStart || ''} hasta el ${formattedDateEnd} ${formattedHourEnd || ''} para las siguientes citas: ${ids}`}); // Llama a massiveReBooking pasando el array de IDs
   
@@ -127,7 +127,7 @@ const RebookingMassively = () => {
   })
 
   setTimeout(() => {
-    navigate("/cedym_system/vista-admission");
+    navigate("/cedym_system");
     setAlert({})
   }, 5000);
 

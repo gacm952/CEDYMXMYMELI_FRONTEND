@@ -7,6 +7,7 @@ import CalendarVista from "../components/CalendarVista";
 import { format } from 'date-fns';
 import Modal2 from '../components/Modal2';
 import PdfDocument from './PdfDocument';
+import { isToday } from 'date-fns';
 
 const Vista = () => {
 
@@ -17,6 +18,8 @@ const [searchTerm, setSearchTerm] = useState('');
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [showPdf, setShowPdf] = useState(false);
 const [alert, setAlert] = useState({})
+const isTodayTrue = isToday(selectedDate);
+
 
 useEffect(() => {
   const currentDate = new Date();
@@ -82,8 +85,12 @@ const handleUpdateResponsable = async (e) => {
 };
 
 const handlePrint = () => {
-  setShowPdf(true);
-}
+  if (isTodayTrue) {
+    setShowPdf(true);
+  } else {
+    setShowPdf(false);
+  }
+};
 
 const filteredBookings = useMemo(() => {
   if (loading || !Array.isArray(allBookings) || !Array.isArray(allUsers)) {
@@ -188,7 +195,7 @@ const filteredBookings = useMemo(() => {
                   </svg>
                 </Link>  
 
-                {showPdf && (
+                {showPdf && isTodayTrue && (
                   <PdfDocument bookings={filteredBookings} />
                 )}
   

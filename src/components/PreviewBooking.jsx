@@ -4,6 +4,7 @@ import { parseISO, format } from "date-fns";
 import useBookings from "../hooks/useBookings";
 import Alert from "./Alert";
 import { useState } from "react";
+import Modal from '../components/Modal';
 
 const PreviewBooking = ({booking}) => {
 
@@ -11,6 +12,7 @@ const { Motive, Type, subType, dateHour, _id } = booking
 const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 const { deleteBooking } = useBookings();
 const [alert, setAlert] = useState({});
+const [isModalOpen, setIsModalOpen] = useState(false);
 const { auth } = useAuth()
 const navigate = useNavigate()
 
@@ -18,8 +20,16 @@ const parseDate = parseISO(dateHour);
 const formattedDate = format(parseDate, 'dd/MM/yyyy');
 const formattedHour = format(parseDate, 'HH:mm');
 
+const openModal = () => {
+  setIsModalOpen(true);
+};
+
+const closeModal = () => {
+  setIsModalOpen(false);
+};
+
 const handleClick = () => {
-    if(confirm("¿Deseas cancelar la cita?")) {
+  
       deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`}) 
 
         setAlert({
@@ -33,8 +43,9 @@ const handleClick = () => {
         window.location.reload();
       }, 3000)
 
-      setIsButtonDisabled(true)
-    } 
+      setIsButtonDisabled(true);
+      setIsModalOpen(false);
+    
 }
 
 const { msg } = alert
@@ -42,6 +53,7 @@ const { msg } = alert
   return (
 
     <>
+            <Modal className=" min-h-screen " isOpen={isModalOpen} onClose={closeModal} onDelete={handleClick} />
             {msg && <Alert alert={alert}/> }
 
     <div className="border-b p-12 gap-16 rounded-xl shadow-md shadow-gray-600 flex flex-col sm:flex-row justify-between">     
@@ -78,14 +90,14 @@ const { msg } = alert
           <div className="flex">
             <span className="max-w-max">
               <button 
-              onClick={handleClick}
+              onClick={openModal}
               disabled={isButtonDisabled}
               > Cancelar
               </button>
             </span>
           </div>
         </div>
-        </div>
+        </div> 
     </div>
     </>
   )

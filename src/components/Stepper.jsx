@@ -32,6 +32,9 @@ const Stepper = () => {
   const [isVisitadorMedico, setIsVisitadorMedico] = useState(false);
   const [userFoundNames, setUserFoundNames] = useState(''); 
   const [typeDocument, setTypeDocument] = useState('');
+  const [foundUserName, setFoundUserName] = useState('');
+  const [foundUserLastName, setFoundUserLastName] = useState('');
+  const [foundUserEmail, setFoundUserEmail] = useState('');
 
   const navigate = useNavigate();
   const params = useParams()
@@ -221,7 +224,7 @@ const Stepper = () => {
 
     // Pasar los datos hacia el provider
 
-    submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId }, 
+    submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId, bookingToName: foundUserName, bookingToLastName: foundUserLastName, bookingToEmail: foundUserEmail }, 
                   {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
     
     setAlert({
@@ -246,8 +249,10 @@ const Stepper = () => {
       if (found && documentTypeVerification) {
         
         setFoundUserId(found._id);
-
-        setSearchEmail(userFoundNames)
+        setFoundUserName(found.name)
+        setFoundUserLastName(found.lastName)
+        setFoundUserEmail(found.email)
+        setSearchEmail(userFoundNames);
 
         setAlert2({
           msg: `Paciente encontrado`,

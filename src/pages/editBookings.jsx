@@ -32,7 +32,7 @@ const isDateActive = bookings.some(booking => booking.Status === "Active")
                     : <p> No Tienes Aún Citas Agendadas.</p>}
                     </h2>
                   </header>
-                  <div className="min-w-[300px] transition ease-in-out delay-100 hover:translate-y-1 hover:scale-105 duration-300 bg-gray-100 shadow mt-10 rounded-lg">
+                  <div className="min-w-[300px] bg-gray-100 shadow mt-10 rounded-lg">
                     {isDateActive ? 
                       bookings
                       .filter(booking => booking.Status === "Active")
