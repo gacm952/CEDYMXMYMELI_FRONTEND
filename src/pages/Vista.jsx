@@ -18,8 +18,25 @@ const [searchTerm, setSearchTerm] = useState('');
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [showPdf, setShowPdf] = useState(false);
 const [alert, setAlert] = useState({})
+const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 const isTodayTrue = isToday(selectedDate);
+const currentTime = new Date();
+const closingTime = new Date(currentTime);
+closingTime.setHours(18, 0, 0);
 
+useEffect(() => {
+  const enableButton = currentTime >= closingTime;
+  setIsButtonEnabled(enableButton);
+
+  if (enableButton) {
+    const timeoutId = setTimeout(() => {
+      setIsButtonEnabled(false);
+    }, 3600000);
+
+    // Limpiar el temporizador al desmontar el componente
+    return () => clearTimeout(timeoutId);
+  }
+}, [currentTime]);
 
 useEffect(() => {
   const currentDate = new Date();
@@ -154,7 +171,8 @@ const filteredBookings = useMemo(() => {
 
 
               <div className='grid items-center'>
-                <button 
+                <button
+                disabled={!isButtonEnabled}
                 onClick={openModal}
                 className='
                       px-6
