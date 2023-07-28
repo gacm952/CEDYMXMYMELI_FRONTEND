@@ -30,7 +30,8 @@ const closeModal = () => {
 
 const handleClick = () => {
   
-      deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`}) 
+  deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`},
+                      {Motive: Motive, Type: Type, subType: subType, dateHour: dateHour, Status: "Delete"}) 
 
         setAlert({
           msg: "Cita cancelada exitosamente",

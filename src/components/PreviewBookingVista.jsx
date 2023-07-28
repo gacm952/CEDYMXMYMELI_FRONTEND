@@ -61,13 +61,14 @@ const closeModal6 = () => {
 };
 
 const onDelete = () => {  
-      deleteBooking(_id, {realizedBy: auth._id, Target: target, Action: "Cita Cancelada"}) 
+  deleteBooking(_id, {realizedBy: auth._id, Target: target, Action: "Cita Cancelada"},
+                {bookingToEmail: userTo.email, bookingToName: userTo.name , bookingToLastName: userTo.lastName, dateHour: dateHour, Status: "Delete"}) 
 
-      setTimeout(() => {
-        setAlert({})
-      }, 3000)
+  setTimeout(() => {
+    setAlert({})
+  }, 3000)
 
-      setIsModalOpen(false);
+  setIsModalOpen(false);
 }
 
 const handleUpdateStatus = async (bookingId, passwordInput) => {

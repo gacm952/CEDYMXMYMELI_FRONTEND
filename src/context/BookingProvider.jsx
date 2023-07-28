@@ -166,7 +166,7 @@ const BookingProvider = ({children}) => {
         }
     }
 
-    const deleteBooking = async (id, dataAction) => {
+    const deleteBooking = async (id, dataAction, updatedBookingStatus) => {
         try {
             const token = localStorage.getItem('token')
 
@@ -179,11 +179,7 @@ const BookingProvider = ({children}) => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 }
-            }
-
-            const updatedBookingStatus = {
-                Status: "Delete",
-              };          
+            }         
 
             const { data } = await costumerAxios.put(`/${id}/delete`, updatedBookingStatus, config)
             
