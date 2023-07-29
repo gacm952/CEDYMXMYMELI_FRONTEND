@@ -81,7 +81,7 @@ const Register = () => {
       const passwordError = passwordValidation(password);
 
       if (!roleAdmission) {
-        if ([password, confirmPassword].includes('')) {
+        if ([password, confirmPassword, email].includes('')) {
           setAlert({
             msg: 'todos los campos son obligatorios',
             error: true,
@@ -132,7 +132,7 @@ const Register = () => {
       }
 
       if ([typeDocument, document, name, lastName, 
-          email, phoneNumber, address, dateOfBirth, 
+          phoneNumber, address, dateOfBirth, 
           civilStatus, typeOfBlood].includes('')) {
         setAlert({
           msg: 'todos los campos son obligatorios',
@@ -196,6 +196,7 @@ const Register = () => {
         return;
       }
 
+      const lowerCaseEmail = email ? toLowerCaseEmail(email) : undefined;
 
       setAlert({})
 
@@ -211,7 +212,7 @@ const Register = () => {
           secondName: toTitleCase(secondName),
           lastName: toTitleCase(lastName),
           secondLastName: toTitleCase(secondLastName),
-          email: toLowerCaseEmail(email),
+          email: lowerCaseEmail,
           phoneNumber, 
           address, 
           dateOfBirth, 
@@ -219,7 +220,7 @@ const Register = () => {
           typeOfBlood, 
           registeredBy: auth._id }) 
 
-        await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document })
+        await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document, typeDocument: typeDocument })
 
         setAlert({
           msg: data.msg,
@@ -233,11 +234,13 @@ const Register = () => {
 
         // Hashear el correo
 
-        setEmailMask(maskEmailPart(email))
+        const maskedEmail = email ? maskEmailPart(email) : '';
+
+        setEmailMask(maskedEmail)
 
         // Reiniciar el formulario
 
-       setName('')
+        setName('')
         setSecondName('')
         setTypeDocument('')
         setDocument('')
@@ -596,7 +599,7 @@ const Register = () => {
                                   <input 
                                     id='address'
                                     type="text" 
-                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    className="mt-2 shadow appearance-none border rounded w-full py-[.95rem] px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     placeholder="Dirección"
                                     value = {address}
                                     onChange = {e => setAddress(e.target.value)} 
@@ -608,16 +611,13 @@ const Register = () => {
                                   htmlFor="dateOfBirth" 
                                   className="block font-semibold text-gray-700 mt-2 lg:mt-0">Fecha de Nacimiento
                                   </label>
-                                  <input 
-                                    id='dateOfBirth'
-                                    type="Date" 
-                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    value = {dateOfBirth}
-                                    onChange = {e => setDateOfBirth(e.target.value)} 
-                                    min={"1925-01-01"}
-                                    max={new Date().toISOString().split('T')[0]}
-                                  />
-                                </div>    
+                                  
+                                  <div className='mt-2'>
+                                  <CalendarRegister
+                                  value={dateOfBirth}
+                                  onChange={(newValue) => setDateOfBirth(newValue)}/>
+                                  </div>
+                                </div>      
 
                                 <div>
                                   <label 
@@ -903,7 +903,7 @@ const Register = () => {
                                     <input 
                                       id='address'
                                       type="text" 
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-[.95rem] px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       placeholder="Dirección"
                                       value = {address}
                                       onChange = {e => setAddress(e.target.value)} 
@@ -915,15 +915,12 @@ const Register = () => {
                                     htmlFor="dateOfBirth" 
                                     className="block font-semibold text-gray-700 mt-2 lg:mt-0">Fecha de Nacimiento
                                     </label>
-                                    <input 
-                                      id='dateOfBirth'
-                                      type="Date" 
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                      value = {dateOfBirth}
-                                      onChange = {e => setDateOfBirth(e.target.value)} 
-                                      min={"1925-01-01"}
-                                      max={new Date().toISOString().split('T')[0]}
-                                    />
+                                    
+                                    <div className='mt-2'>
+                                    <CalendarRegister
+                                    value={dateOfBirth}
+                                    onChange={(newValue) => setDateOfBirth(newValue)}/>
+                                    </div>
                                   </div>    
   
                                   <div>

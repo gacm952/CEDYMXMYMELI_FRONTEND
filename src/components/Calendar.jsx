@@ -3,10 +3,11 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { DigitalClock } from '@mui/x-date-pickers/DigitalClock';
-import { isWeekend, setDefaultOptions } from 'date-fns';
+import { isWeekend, setDefaultOptions, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import BookingContext from '../context/BookingProvider';
 import fc from 'festivos-colombia';
+import useAuth from '../hooks/useAuth';
 
 function Calendar({ onDateChange, onTimeChange }) {
 
@@ -16,6 +17,10 @@ function Calendar({ onDateChange, onTimeChange }) {
   const [selectedTimes, setSelectedTimes] = useState([]);
   const { dateFromBackend } = useContext(BookingContext);
   const [selectedDate, setSelectedDate] = useState(null);
+  const { auth } = useAuth()
+
+  const isUser = auth.role === "User"
+
 
   const getColombiaHolidays = (year) => {
     return fc.getHolidaysByYear(year)
@@ -89,28 +94,25 @@ function Calendar({ onDateChange, onTimeChange }) {
   const shouldDisableDate = (date) => {
 
     // Obtener una clave única para cada fecha
-   const dateKey = date.toDateString(); 
-   const disabledTimesForDate = selectedTimes[dateKey];
- 
-   // Verificar si todas las citas están seleccionadas para el día
+      const dateKey = date.toDateString(); 
+      const disabledTimesForDate = selectedTimes[dateKey];
    
-   const isAllTimesSelected = disabledTimesForDate && disabledTimesForDate.length === 144;
-
-   // No se pueda agendar para el mismo dia
-
-  // const currentDate = new Date();
-  // const isSameDate = date.toDateString() === currentDate.toDateString();
-
-   // Verificar si la fecha es un día feriado en Colombia
-  const colombiaHolidays = getColombiaHolidays(date.getFullYear());
-  const isHoliday = colombiaHolidays.some((holiday) => holiday.toDateString() === date.toDateString());
- 
-   // Lógica para determinar si la fecha está deshabilitada
-
-   const isDisabled = isWeekend(date) || isAllTimesSelected || isHoliday;
-    
-   return isDisabled;
- };
+    // Verificar si todas las citas están seleccionadas para el día
+     
+     const isAllTimesSelected = disabledTimesForDate && disabledTimesForDate.length === 144;
+  
+    // Verificar si la fecha es un día feriado en Colombia
+      const colombiaHolidays = getColombiaHolidays(date.getFullYear());
+      const isHoliday = colombiaHolidays.some((holiday) => holiday.toDateString() === date.toDateString());
+   
+      const isDisabled =
+        isWeekend(date) ||
+        isAllTimesSelected ||
+        isHoliday ||
+        (isUser && date <= addDays(new Date(), 1));
+      
+     return isDisabled;
+   };
 
   return (
       <LocalizationProvider dateAdapter={AdapterDateFns} localeText={es}>

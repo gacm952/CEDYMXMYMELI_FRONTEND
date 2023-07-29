@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import costumerAxios from "../config/costumerAxios"
 import Alert from "../components/Alert"
 import { useNavigate } from "react-router-dom"
+import useAuth from "../hooks/useAuth"
 
 const NewPassword = () => {
 
@@ -14,6 +15,7 @@ const NewPassword = () => {
   const params = useParams()
   const {token} = params
   const navigate = useNavigate()
+  const { auth } = useAuth()
 
 
   useEffect(() => {
@@ -89,10 +91,13 @@ const NewPassword = () => {
       const url = `/resetpassword/${token}`
 
       const { data } = await costumerAxios.post(url, { password })
+
       setAlert({
         msg: data.msg,
         error: false
       })
+
+      await costumerAxios.post('/newpasswordcreated', { realizedBy: auth._id })
 
       setTimeout(() => {
         navigate("/")
