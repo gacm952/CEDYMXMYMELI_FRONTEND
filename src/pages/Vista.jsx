@@ -19,6 +19,8 @@ const [isModalOpen, setIsModalOpen] = useState(false);
 const [showPdf, setShowPdf] = useState(false);
 const [alert, setAlert] = useState({})
 const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+const [isDayClosed, setIsDayClosed] = useState(false);
+
 const isTodayTrue = isToday(selectedDate);
 const currentTime = new Date();
 const closingTime = new Date(currentTime);
@@ -90,10 +92,11 @@ const handleUpdateResponsable = async (e) => {
       nextDay.setDate(nextDay.getDate() + 1);
       setSelectedDate(nextDay);
 
+      // Marcar el día actual como cerrado
+      setIsDayClosed(true);
+
       // Reiniciar alarma
-
       setAlert({})
-
     }, 3000);
     
   } catch (error) {
@@ -162,7 +165,8 @@ const filteredBookings = useMemo(() => {
               <div className="ml-4">
               <CalendarVista
                value={selectedDate}
-               onChange={handleDateChange}/>
+               onChange={handleDateChange}
+               isDayClosed={isDayClosed}/>
               </div>
 
             </div>

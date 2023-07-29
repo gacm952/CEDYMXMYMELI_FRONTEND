@@ -131,8 +131,7 @@ const Register = () => {
         return
       }
 
-      if ([typeDocument, document, name,
-          secondName, lastName, secondLastName, 
+      if ([typeDocument, document, name, lastName, 
           email, phoneNumber, address, dateOfBirth, 
           civilStatus, typeOfBlood].includes('')) {
         setAlert({
@@ -145,9 +144,9 @@ const Register = () => {
       const isDocumentValid = /^\d+$/.test(document);
       const isPhoneNumberValid = /^\d+$/.test(phoneNumber);
       const isNameValid = /^[A-Za-z]+$/.test(name);
-      const isSecondNameValid = /^[A-Za-z]+$/.test(secondName);
+      const isSecondNameValid = /^$|^[A-Za-z]+$/.test(secondName);
       const isLastNameValid = /^[A-Za-z]+$/.test(lastName);
-      const isSecondLastNameValid = /^[A-Za-z]+$/.test(secondLastName);
+      const isSecondLastNameValid = /^$|^[A-Za-z]+$/.test(secondLastName);
 
       if (!isNameValid) {
         setAlert({

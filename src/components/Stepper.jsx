@@ -224,7 +224,7 @@ const Stepper = () => {
 
     // Pasar los datos hacia el provider
 
-    submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId, bookingToName: foundUserName, bookingToLastName: foundUserLastName, bookingToEmail: foundUserEmail }, 
+    submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId, bookingToName: foundUserName || auth.name, bookingToLastName: foundUserLastName || auth.lastName, bookingToEmail: foundUserEmail || auth.email }, 
                   {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
     
     setAlert({

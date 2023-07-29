@@ -5,10 +5,13 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { isWeekend, setDefaultOptions, addDays, startOfToday, addMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const CalendarVista = ({ value, onChange }) => {
+const CalendarVista = ({ value, onChange, isDayClosed }) => {
   setDefaultOptions({ locale: es });
 
   const handleDateChange = (newValue) => {
+    if (isDayClosed) {
+      return;
+    }
     onChange(newValue);
   };
 
@@ -22,13 +25,16 @@ const CalendarVista = ({ value, onChange }) => {
     const today = startOfToday();
     const threeMonthsLater = addMonths(today, 3);
 
-    return date > threeMonthsLater;
-   
-  
-  /* // Solo mostrar los dos días siguientes al actual
-    const today = startOfToday();
-    const twoDaysLater = addDays(today, 1);
-    return date > twoDaysLater;*/
+    if (date > threeMonthsLater) {
+      return true;
+    }
+
+    // Deshabilitar el día si ya ha sido cerrado
+    if (isDayClosed) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
