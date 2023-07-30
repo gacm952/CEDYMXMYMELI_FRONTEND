@@ -17,11 +17,11 @@ const [selectedDate, setSelectedDate] = useState(new Date());
 const [searchTerm, setSearchTerm] = useState('');
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [showPdf, setShowPdf] = useState(false);
-const [alert, setAlert] = useState({})
+const [alert, setAlert] = useState({});
 const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 const [isDayClosed, setIsDayClosed] = useState(false);
-
 const isTodayTrue = isToday(selectedDate);
+
 const currentTime = new Date();
 const closingTime = new Date(currentTime);
 closingTime.setHours(18, 0, 0);
@@ -40,17 +40,22 @@ useEffect(() => {
   }
 }, [currentTime]);
 
-useEffect(() => {
-  const currentDate = new Date();
-  setSelectedDate(currentDate);
-}, [allBookings, allUsers]); 
-
 const formattedSelectedDate = selectedDate ? format(new Date(selectedDate), 'yyyy-MM-dd') : '';
 const dateAction = selectedDate ? format(new Date(selectedDate), 'dd-MM-yyyy') : '';
 
 const handleDateChange = (newValue) => {
   setSelectedDate(newValue);
+
+  localStorage.setItem('selectedDate', JSON.stringify(newValue));
 };
+
+useEffect(() => {
+  const storedDate = localStorage.getItem('selectedDate');
+
+  if (storedDate) {
+    setSelectedDate(new Date(JSON.parse(storedDate)));
+  }
+}, []);
 
 const handleSearch = (event) => {
   if (event.key === 'Enter') {
@@ -68,6 +73,7 @@ const closeModal = () => {
 };
 
 const handleUpdateResponsable = async (e) => {
+
   e.preventDefault();
 
   try {
@@ -135,7 +141,6 @@ const filteredBookings = useMemo(() => {
   });
 }, [loading, allBookings, allUsers, selectedDate, formattedSelectedDate, searchTerm]);
 
-
     return (
       <>  
       <div className="min-w-7xl min-h-screen mx-8 text-xl sm:text-sm">
@@ -175,7 +180,7 @@ const filteredBookings = useMemo(() => {
 
 
               <div className='grid items-center'>
-                <button
+                <button 
                 disabled={!isButtonEnabled}
                 onClick={openModal}
                 className='

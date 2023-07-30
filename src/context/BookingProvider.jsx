@@ -104,13 +104,22 @@ const BookingProvider = ({children}) => {
           
             await costumerAxios.post('/editbookingact', dataAction, config)
 
-                setBookings((prevBookings) => {
+                setAllBookings((prevBookings) => {
                   return prevBookings.map((prevBooking) => {
                     if (prevBooking.id === data.id) {
                       return data;
                     }
                     return prevBooking;
                   });
+                });
+
+                setBookings((prevAllBookings) => {
+                    return prevAllBookings.map((prevBooking) => {
+                        if (prevBooking._id === data._id) {
+                            return data;
+                        }
+                        return prevBooking;
+                    });
                 });
               
             setTimeout(() => {
@@ -149,6 +158,8 @@ const BookingProvider = ({children}) => {
             await costumerAxios.post('/bookingcreated', dataAction, config)
                             
             setTimeout( () => {
+                setAllBookings((prevBookings) => [...prevBookings, data])
+
                 setBookings((prevBookings) => [...prevBookings, data])
 
                 if (isAdmission) {
@@ -193,6 +204,17 @@ const BookingProvider = ({children}) => {
                     return prevBooking;
                 });
             });
+
+            setTimeout(() => {
+                setBookings((prevAllBookings) => {
+                    return prevAllBookings.map((prevBooking) => {
+                        if (prevBooking._id === data._id) {
+                            return data;
+                        }
+                        return prevBooking;
+                    });
+                });
+            }, 3000);
 
         } catch (error) {
             console.log(error)

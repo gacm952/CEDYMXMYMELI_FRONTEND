@@ -41,7 +41,6 @@ const handleClick = () => {
       setTimeout(() => {
         setAlert({})
         navigate('/Bookings')
-        window.location.reload();
       }, 3000)
 
       setIsButtonDisabled(true);
