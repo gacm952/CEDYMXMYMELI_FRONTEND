@@ -32,24 +32,52 @@ const closeModal = () => {
 
 const handleClick = () => {
 
-      setIsModalOpen1(true)
+  const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
+  const currentDate = new Date();
+  const bookingDate = new Date(dateHour); 
+  const timeDifferenceInMilliseconds = bookingDate - currentDate;
+  const differenceInDays = timeDifferenceInMilliseconds / oneDayInMilliseconds;
+
+  if (differenceInDays < 1) {
+
+    setIsModalOpen(false);
+
+    setAlert({
+      msg: "No puedes cancelar la cita un dia antes de la fecha prevista",
+      error: true
+    }); 
+    
+    setTimeout(() => {
+      setAlert({}); 
+    }, 5000); 
+
+    return 
+  }
+
+  try {
+
+    setIsModalOpen1(true)
   
-      deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`},
-                    {Motive: Motive, Type: Type, subType: subType, dateHour: dateHour, Status: "Delete"}) 
+    deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`},
+                  {Motive: Motive, Type: Type, subType: subType, dateHour: dateHour, Status: "Delete"}) 
 
-        setAlert({
-          msg: "Cita cancelada exitosamente",
-          error: false
-      });  
+      setAlert({
+        msg: "Cita cancelada exitosamente",
+        error: false
+    });  
 
-      setTimeout(() => {
-        setAlert({})
-        navigate('/Bookings')
-        setIsModalOpen1(false)
-      }, 3000)
+    setTimeout(() => {
+      setAlert({})
+      navigate('/Bookings')
+      setIsModalOpen1(false)
+    }, 3000)
 
-      setIsButtonDisabled(true);
-      setIsModalOpen(false);
+    setIsButtonDisabled(true);
+    setIsModalOpen(false);
+    
+  } catch (error) {
+    console.log(error)
+  }
     
 }
 

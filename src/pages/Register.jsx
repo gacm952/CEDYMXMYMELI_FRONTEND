@@ -5,6 +5,7 @@ import Alert2 from '../components/Alert2'
 import costumerAxios from '../config/costumerAxios'
 import useAuth from '../hooks/useAuth'
 import Modal8 from '../components/Modal8'
+import CalendarRegister from '../components/CalendarRegister'
 
 const Register = () => {
 
