@@ -15,13 +15,13 @@ const { Motive, Type, subType, dateHour, _id, bookingFor, bookingTo, Status} = b
 const { allUsers, submitResposable, auth } = useAuth()
 const memoizedAllUsers = useMemo(() => allUsers, [allUsers]);
 const parseDate = parseISO(dateHour)
-const formattedHour = format(parseDate, 'HH:mm');
+const formattedHour = format(parseDate, 'hh:mm a');
 const [alert, setAlert] = useState({})
 const { deleteBooking, updateStatus } = useBookings();
 const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalOpen8, setIsModalOpen8] = useState(false);
 const [isModalOpen5, setIsModalOpen5] = useState(false);
 const [isModalOpen6, setIsModalOpen6] = useState(false);
-const [isModalOpen8, setIsModalOpen8] = useState(false);
 
 const bookingId = booking._id
 const userIDtoCompare = bookingFor;
@@ -34,6 +34,7 @@ const userDocument = userTo ? `${userTo.document}` : user ? `${user.document}` :
 const userName = userTo ? `${userTo.name}` : user ? `${user.name}` : "Usuario Desconocido";
 const userlastName = userTo ? `${userTo.lastName}` : user ? `${user.lastName}` : "Usuario Desconocido";
 const isEPS = Type === "EPS"
+const isVisitadorMedico = Type === "Visitador Médico"
 const isActive = Status === "Active"
 const target = bookingTo || bookingFor ;
 
@@ -63,16 +64,16 @@ const closeModal6 = () => {
 };
 
 const onDelete = () => {  
-  setIsModalOpen8(true)
-  deleteBooking(_id, {realizedBy: auth._id, Target: target, Action: "Cita Cancelada"},
-                {bookingToEmail: userTo.email, bookingToName: userTo.name , bookingToLastName: userTo.lastName, dateHour: dateHour, Status: "Delete"}) 
+      setIsModalOpen8(true)
+      deleteBooking(_id, {realizedBy: auth._id, Target: target, Action: "Cita Cancelada"},
+                    {bookingToEmail: userTo.email, bookingToName: userTo.name , bookingToLastName: userTo.lastName, dateHour: dateHour, Status: "Delete"}) 
 
-  setTimeout(() => {
-    setAlert({})
-    setIsModalOpen8(false)
-  }, 3000)
+      setTimeout(() => {
+        setAlert({})
+        setIsModalOpen8(false)
+      }, 3000)
 
-  setIsModalOpen(false);
+      setIsModalOpen(false);
 }
 
 const handleUpdateStatus = async (bookingId, passwordInput) => {
@@ -112,13 +113,15 @@ const { msg } = alert
                     <p className="grid items-center text-center ">
                       {userlastName}</p>
                   
-                    <p className="grid items-center text-center whitespace-nowrap ">
-                    {!isEPS && Type} {isEPS && 
-                        subType
-                        }  </p>
+                    <p className="grid items-center text-center ">
+                    {!isEPS && Type} 
+                    {isEPS && subType}  
+                    </p>
                  
-                    <p className="grid items-center text-center whitespace-nowrap ">
-                      {Motive}</p>
+                    <p className="grid items-center text-center">
+                    {isVisitadorMedico && Type}
+                    {!isVisitadorMedico && Motive}
+                    </p>
         
                     <p className="grid items-center text-center ">
                       {formattedHour}</p>
@@ -144,22 +147,23 @@ const { msg } = alert
                   <Modal5 isOpen={isModalOpen5} onClose={closeModal5} onConfirm={handleUpdateStatus} bookingId={bookingId}/>
                         
                   {!isActive && (
-                     <div className="flex justify-center">
-                     <button 
-                     className="px-7 gap-4 max-w-[100px]"
-                     onClick={openModal6}
-                     >
-                       <div className="flex justify-center text-center group border rounded-lg border-gray-500 px-2 py-2 hover:border-red-700 hover:bg-red-700">
-                       <svg
-                         viewBox="0 0 320 512"
-                         fill="red"
-                         className="h-4 w-4 group-hover:fill-white"
-                       >
-                         <path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3l105.4 105.3c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256l105.3-105.4z" />
-                       </svg>
-                       </div>
-                     </button>
-                   </div>
+                  <div className="flex justify-center">
+                    <button 
+                    className="px-7 gap-4 max-w-[100px]"
+                    onClick={openModal6}
+                    >
+                      <div className="flex justify-center text-center group border rounded-lg border-gray-500 px-2 py-2 hover:border-red-700 hover:bg-red-700">
+                      <svg
+                        viewBox="0 0 320 512"
+                        fill="red"
+                        className="h-4 w-4 group-hover:fill-white"
+                      >
+                        <path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3l105.4 105.3c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256l105.3-105.4z" />
+                      </svg>
+                      </div>
+                    </button>
+                  </div>
+
                       )}
 
                     <Modal6  isOpen={isModalOpen6} onClose={closeModal6} onConfirm={handleUpdateStatus} bookingId={bookingId}/>
