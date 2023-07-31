@@ -50,6 +50,8 @@ const Stepper = () => {
   const bookingData = allBookings.find(booking => booking._id === params.id) 
   const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
 
+  const formattedTime = selectedTime ? format(selectedTime, 'h:mm a') : null;
+
   useEffect(() => {
     if (params.id) {
       setId(params.id);
@@ -477,9 +479,7 @@ const Stepper = () => {
                         onChange={handleUserDataChange}
                     >
                         <option value="" hidden>Selecciona una opción</option>
-                        <option value="Laboratorio">Laboratorio</option>
-                        <option value="Laboratorio">Laboratorio</option>
-                        <option value="Laboratorio">Laboratorio</option>
+                        <option value="Boehringer Ingelheim">Boehringer Ingelheim</option>
                     </select>
                 </div>
               )}
@@ -582,7 +582,7 @@ const Stepper = () => {
             )}            
             <p>Motivo: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
             <p>Fecha Seleccionada: <span className='font-semibold'>{selectedDate?.toLocaleDateString()}</span> </p>
-            <p>Hora Seleccionada: <span className='font-semibold'>{selectedTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> </p>
+            <p>Hora Seleccionada: <span className='font-semibold'>{formattedTime}</span> </p>
           </div>
         );
       default:
@@ -609,7 +609,7 @@ const Stepper = () => {
             )}            
             <p>Motivo: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
             <p>Fecha Seleccionada: <span className='font-semibold'>{selectedDate?.toLocaleDateString()}</span> </p>
-            <p>Hora Seleccionada: <span className='font-semibold'>{selectedTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> </p>
+            <p>Hora Seleccionada: <span className='font-semibold'>{formattedTime}</span> </p>
           </div>
         );
       default:

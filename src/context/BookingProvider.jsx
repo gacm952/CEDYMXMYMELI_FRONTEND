@@ -169,6 +169,9 @@ const BookingProvider = ({children}) => {
                 if (isUser) {
                     navigate("/Bookings")
                 }
+
+                window.location.reload()
+                
             }, 5000 )             
 
         
