@@ -30,15 +30,40 @@ const closeModal = () => {
   setIsModalOpen(false);
 };
 
-const handleClick = () => {
-
+const calculateDifferenceInDays = (dateHour) => {
   const oneDayInMilliseconds = 24 * 60 * 60 * 1000;
   const currentDate = new Date();
   const bookingDate = new Date(dateHour); 
   const timeDifferenceInMilliseconds = bookingDate - currentDate;
   const differenceInDays = timeDifferenceInMilliseconds / oneDayInMilliseconds;
+  return differenceInDays;
+};
 
-  if (differenceInDays < 1) {
+const handleEditBooking = () => {
+
+  const differenceInDays = calculateDifferenceInDays(dateHour);
+
+  if (differenceInDays < 2) {
+    // Mostrar alerta
+    setAlert({
+      msg: "No puedes editar la cita un día antes de la fecha prevista",
+      error: true,
+    });
+
+    setTimeout(() => {
+      setAlert({});
+    }, 5000);
+  } else {
+    // Redireccionar a la página de edición
+    navigate(`/Bookings/editBooking/${_id}`);
+  }
+};
+
+const handleClick = () => {
+
+  const differenceInDays = calculateDifferenceInDays(dateHour);
+
+  if (differenceInDays < 2) {
 
     setIsModalOpen(false);
 
@@ -111,8 +136,9 @@ const { msg } = alert
           </svg>
           <div className="flex">
             <span className="max-w-max">
-              <Link className="" to={`/Bookings/editBooking/${_id}`}
-              >Modificar</Link>
+              <button 
+              onClick={handleEditBooking} 
+              >Modificar</button>
             </span>
           </div>
         </div>
