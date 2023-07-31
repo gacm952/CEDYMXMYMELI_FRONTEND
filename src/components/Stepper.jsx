@@ -38,6 +38,7 @@ const Stepper = () => {
   const [foundUserLastName, setFoundUserLastName] = useState('');
   const [foundUserEmail, setFoundUserEmail] = useState('');
 
+  const formattedTime = selectedTime ? format(selectedTime, 'h:mm a') : null;
 
   const navigate = useNavigate();
   const params = useParams()
@@ -49,8 +50,6 @@ const Stepper = () => {
   const isResponsable = [auth].some((role) => role.responsable === true)
   const bookingData = allBookings.find(booking => booking._id === params.id) 
   const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
-
-  const formattedTime = selectedTime ? format(selectedTime, 'h:mm a') : null;
 
   useEffect(() => {
     if (params.id) {
@@ -241,8 +240,22 @@ const Stepper = () => {
 
       setIsModalOpen2(true)
 
-      submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId, bookingToName: foundUserName || auth.name, bookingToLastName: foundUserLastName || auth.lastName, bookingToEmail: foundUserEmail || auth.email }, 
-        {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
+      const bookingData = {
+        dateHour,
+        Type,
+        subType,
+        Motive: updatedMotive,
+        bookingTo: foundUserId,
+        bookingToName: foundUserName || auth.name,
+        bookingToLastName: foundUserLastName || auth.lastName,
+        bookingToEmail: foundUserEmail || auth.email,
+      };
+      
+      if (id !== null) {
+        bookingData.id = id;
+      }
+
+      submitBooking(bookingData, {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
 
       setAlert({
       msg: 'Cita agendada correctamente, ¡te esperamos!',
