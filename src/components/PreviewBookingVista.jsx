@@ -7,6 +7,7 @@ import useAuth from '../hooks/useAuth';
 import Modal from "./Modal";
 import Modal5 from '../components/Modal5';
 import Modal6 from "./Modal6";
+import Modal8 from '../components/Modal8'
 
 const PreviewBookingVista = ({booking}) => {
 
@@ -20,6 +21,7 @@ const { deleteBooking, updateStatus } = useBookings();
 const [isModalOpen, setIsModalOpen] = useState(false);
 const [isModalOpen5, setIsModalOpen5] = useState(false);
 const [isModalOpen6, setIsModalOpen6] = useState(false);
+const [isModalOpen8, setIsModalOpen8] = useState(false);
 
 const bookingId = booking._id
 const userIDtoCompare = bookingFor;
@@ -61,11 +63,13 @@ const closeModal6 = () => {
 };
 
 const onDelete = () => {  
+  setIsModalOpen8(true)
   deleteBooking(_id, {realizedBy: auth._id, Target: target, Action: "Cita Cancelada"},
                 {bookingToEmail: userTo.email, bookingToName: userTo.name , bookingToLastName: userTo.lastName, dateHour: dateHour, Status: "Delete"}) 
 
   setTimeout(() => {
     setAlert({})
+    setIsModalOpen8(false)
   }, 3000)
 
   setIsModalOpen(false);
@@ -91,6 +95,8 @@ const { msg } = alert
 
     <>
             {msg && <Alert alert={alert}/> }
+
+            <Modal8 isOpen={isModalOpen8} />
 
             <div className="">  
                 <div className='grid grid-cols-9 mb-1 rounded gap-10 p-2 border border-gray-500'>

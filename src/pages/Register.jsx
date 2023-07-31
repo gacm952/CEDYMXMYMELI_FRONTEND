@@ -4,6 +4,7 @@ import Alert from '../components/Alert'
 import Alert2 from '../components/Alert2'
 import costumerAxios from '../config/costumerAxios'
 import useAuth from '../hooks/useAuth'
+import Modal8 from '../components/Modal8'
 
 const Register = () => {
 
@@ -30,10 +31,19 @@ const Register = () => {
   const [fathersForm, setfathersForm] = useState(false);
   const [emailMask, setEmailMask] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const roleUser = [auth].some((role) => role.role === "User")
   const roleAdmission = [auth].some((role) => role.role === "Admission")
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const maskEmailPart = (email) => {
     const atIndex = email.indexOf('@');
@@ -203,6 +213,8 @@ const Register = () => {
       // Crear el User
        
       try {
+
+        setIsModalOpen(true)
        
         const { data } = await costumerAxios.post(`/register`,
         { password, 
@@ -222,6 +234,8 @@ const Register = () => {
 
         await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document, typeDocument: typeDocument })
 
+        setIsModalOpen(false)
+      
         setAlert({
           msg: data.msg,
           error: false
@@ -326,6 +340,8 @@ const Register = () => {
 
     {roleAdmission && (
         <section className='w-full min-h-screen flex-grow flex justify-center items-center'>
+
+          <Modal8 isOpen={isModalOpen} onClose={closeModal} />
                     
           <div className='grid grid-cols-2 items-center'>
 
@@ -687,6 +703,7 @@ const Register = () => {
 
     {!roleAdmission && (
         <div className="flex justify-center items-center mx-auto max-w-screen-2xl px-4 py-6 sm:pb-8 sm:pt-20 sm:px-6 lg:px-8">  
+          <Modal8 isOpen={isModalOpen} onClose={closeModal} /> 
         <div className="grid">
           <div className="flex justify-center max-w-2xl shadow-md shadow-gray-600 border-2 border-emerald-600 rounded-3xl">
             <div className="p-8 sm:p-16 lg:py-24 lg:px-16">

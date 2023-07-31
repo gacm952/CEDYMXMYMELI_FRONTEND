@@ -5,6 +5,7 @@ import useBookings from "../hooks/useBookings";
 import Alert from "./Alert";
 import { useState } from "react";
 import Modal from '../components/Modal';
+import Modal8 from '../components/Modal8'
 
 const PreviewBooking = ({booking}) => {
 
@@ -13,6 +14,7 @@ const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 const { deleteBooking } = useBookings();
 const [alert, setAlert] = useState({});
 const [isModalOpen, setIsModalOpen] = useState(false);
+const [isModalOpen1, setIsModalOpen1] = useState(false);
 const { auth } = useAuth()
 const navigate = useNavigate()
 
@@ -29,9 +31,11 @@ const closeModal = () => {
 };
 
 const handleClick = () => {
+
+      setIsModalOpen1(true)
   
-  deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`},
-                      {Motive: Motive, Type: Type, subType: subType, dateHour: dateHour, Status: "Delete"}) 
+      deleteBooking(_id, {realizedBy: auth._id, Action: `Cita Cancelada por el usuario ${auth._id}`},
+                    {Motive: Motive, Type: Type, subType: subType, dateHour: dateHour, Status: "Delete"}) 
 
         setAlert({
           msg: "Cita cancelada exitosamente",
@@ -41,6 +45,7 @@ const handleClick = () => {
       setTimeout(() => {
         setAlert({})
         navigate('/Bookings')
+        setIsModalOpen1(false)
       }, 3000)
 
       setIsButtonDisabled(true);
@@ -54,6 +59,9 @@ const { msg } = alert
 
     <>
             <Modal className=" min-h-screen " isOpen={isModalOpen} onClose={closeModal} onDelete={handleClick} />
+            <Modal8 className=" min-h-screen " isOpen={isModalOpen1} />
+
+
             {msg && <Alert alert={alert}/> }
 
     <div className="border-b p-12 gap-16 rounded-xl shadow-md shadow-gray-600 flex flex-col sm:flex-row justify-between">     

@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import costumerAxios from '../config/costumerAxios'
 import Alert from "../components/Alert"
+import Modal8 from '../components/Modal8'
 
 const ForgotPassword = () => {
 
   const [email, setEmail] = useState('')
   const [emailSent, setEmailSent] = useState(false)
   const [alert, setAlert] = useState({})
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -20,7 +22,11 @@ const ForgotPassword = () => {
       return
     }   
     try {
+      setIsModalOpen(true)
+
       const { data } = await costumerAxios.post(`/resetpassword`, {email})
+
+      setIsModalOpen(false)
 
       setAlert({
         msg: data.msg,
@@ -51,6 +57,8 @@ const ForgotPassword = () => {
             <div className="p-8 sm:p-32 lg:py-40 lg:px-16 lg:my-12">
                  <h2 className="text-center text-4xl font-extrabold sm:text-5xl font-poppins text-gray-900 mb-12 capitalize">Recupera tu contraseña
               </h2>
+
+              <Modal8 isOpen={isModalOpen} />
 
               {msg && <Alert alert={alert}/> }
 

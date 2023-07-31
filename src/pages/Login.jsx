@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Alert from '../components/Alert'
 import costumerAxios from '../config/costumerAxios'
 import useAuth from '../hooks/useAuth';
+import Modal8 from '../components/Modal8'
 
 const Login = () => {
 
@@ -11,9 +12,14 @@ const Login = () => {
   const [alert, setAlert] = useState({})
   const navigate = useNavigate()
   const { auth, setAuth } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isUser = [auth].some((role) => role.role === "User")
   const isAdmission = [auth].some((role) => role.role === "Admission")
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -27,7 +33,13 @@ const Login = () => {
     }
 
     try {
+      
+      setIsModalOpen(true)
+
       const { data } = await costumerAxios.post('/login', {email, password})
+
+      setIsModalOpen(false)
+
 
       setAlert({})
       
@@ -64,6 +76,7 @@ const Login = () => {
   return (
     <>
     <section className='w-full items-center min-h-screen flex justify-center'>
+    <Modal8 isOpen={isModalOpen} onClose={closeModal} />
     <div className="flex justify-center mx-auto max-w-screen-2xl px-4 sm:pb-8 sm:pt-20 sm:px-6 lg:px-8">
       <div className="grid">
         <div className="flex justify-center max-w-2xl shadow-md shadow-gray-600 border-2 border-emerald-600 rounded-3xl">  

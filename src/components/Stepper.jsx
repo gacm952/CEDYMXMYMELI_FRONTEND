@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import Modal3 from './Modal3';
 import Modal4 from './Modal4';
 import { parseISO, format } from 'date-fns';
+import Modal8 from '../components/Modal8'
 
 const Stepper = () => {
 
@@ -28,6 +29,7 @@ const Stepper = () => {
   const [alert2, setAlert2] = useState({})
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [showCitaValorativa, setShowCitaValorativa] = useState(false);
   const [isVisitadorMedico, setIsVisitadorMedico] = useState(false);
   const [userFoundNames, setUserFoundNames] = useState(''); 
@@ -36,11 +38,14 @@ const Stepper = () => {
   const [foundUserLastName, setFoundUserLastName] = useState('');
   const [foundUserEmail, setFoundUserEmail] = useState('');
 
+
   const navigate = useNavigate();
   const params = useParams()
   const { allBookings, submitBooking, bookings } = useBookings();
   const { auth, allUsers } = useAuth();
   const roleUser = [auth].some((role) => role.role === "User")
+  const roleAdmission = [auth].some((role) => role.role === "Admission")
+
   const isResponsable = [auth].some((role) => role.responsable === true)
   const bookingData = allBookings.find(booking => booking._id === params.id) 
   const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
@@ -169,6 +174,12 @@ const Stepper = () => {
     3: "Verifica tus Datos."
   };
 
+  const stepTextEditing = {
+    1: "Selecciona una Fecha Disponible.",
+    2: "Verifica tus Datos."
+  };
+
+
   const {Type, subType, Motive} = userData
   const dateHour = `${selectedDate}, ${selectedTime}`
   const citaData = {
@@ -224,16 +235,23 @@ const Stepper = () => {
 
     // Pasar los datos hacia el provider
 
-    submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId, bookingToName: foundUserName || auth.name, bookingToLastName: foundUserLastName || auth.lastName, bookingToEmail: foundUserEmail || auth.email }, 
-                  {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
-    
-    setAlert({
+    try {
+
+      setIsModalOpen2(true)
+
+      submitBooking({id, dateHour, Type, subType, Motive: updatedMotive, bookingTo: foundUserId, bookingToName: foundUserName || auth.name, bookingToLastName: foundUserLastName || auth.lastName, bookingToEmail: foundUserEmail || auth.email }, 
+        {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
+
+      setAlert({
       msg: 'Cita agendada correctamente, ¡te esperamos!',
       error: false,
-    });
+      });
 
-    setIsButtonDisabled(true);
-
+      setIsButtonDisabled(true);
+      
+    } catch (error) {
+      console.log(error)
+    }
     };
      
   const handleSearch = (e) => {
@@ -283,6 +301,8 @@ const Stepper = () => {
     };
 
   const renderStepContent = () => {
+
+    if ((roleUser && !params.id) || roleAdmission) {
     switch (step) {
       case 1:
         return (
@@ -357,7 +377,7 @@ const Stepper = () => {
                   </div>
                   <Modal3 isOpen={isModalOpen} onClose={closeModal} />
                 </div> )}
-               
+                    
                <div className="flex flex-col my-4">
                   <label
                     className="inline-flex mb-2 text-sm text-gray-800"
@@ -439,6 +459,31 @@ const Stepper = () => {
                 </div>
               )}
 
+                 {/* IF Visitador medico CLICKED SHOW SECOND SELECT */}
+
+                 {userData.Type === "Visitador Médico" && (
+                <div className="flex flex-col mt-4">
+                    <label 
+                    className="inline-flex mb-2 text-sm text-gray-800" 
+                    htmlFor='subType' >
+                        Selecciona a Cual Laboratorio Perteneces
+                    </label>
+                    <select
+                        id='subType'
+                        name="subType"
+                        className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                        "
+                        value={userData.subType || ""}
+                        onChange={handleUserDataChange}
+                    >
+                        <option value="" hidden>Selecciona una opción</option>
+                        <option value="Laboratorio">Laboratorio</option>
+                        <option value="Laboratorio">Laboratorio</option>
+                        <option value="Laboratorio">Laboratorio</option>
+                    </select>
+                </div>
+              )}
+
                 </div>
 
                 <div className="flex flex-col">
@@ -515,8 +560,6 @@ const Stepper = () => {
                     )}
                     
                 </div>
-
-
             </form>
           </div>
         );
@@ -545,6 +588,35 @@ const Stepper = () => {
       default:
         return null;
     }
+  } else {
+     switch (step) {
+      case 1:
+        return (
+          <div>
+            <Calendar  
+          selectedDate={selectedDate}
+          selectedTime={selectedTime} 
+          onDateChange={handleDateChange} 
+          onTimeChange={handleTimeChange}/>
+          </div>
+        );
+      case 2:
+        return (
+          <div className='text-justify p-4 '>
+            <p>Tipo de Paciente: <span className='font-semibold'>{userData.Type} {userData.Type === "Medicina Prepagada" ? userData.subType : ""} </span> </p>
+            {userData.Type === "EPS" && (
+            <p>EPS: <span className='font-semibold'> {userData.subType}</span></p>
+            )}            
+            <p>Motivo: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
+            <p>Fecha Seleccionada: <span className='font-semibold'>{selectedDate?.toLocaleDateString()}</span> </p>
+            <p>Hora Seleccionada: <span className='font-semibold'>{selectedTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span> </p>
+          </div>
+        );
+      default:
+        return null;
+    }
+  }
+    
   };
 
   const HeaderTitleUser = () => {
@@ -569,107 +641,199 @@ const Stepper = () => {
 
   return (  
     <div>
-      <div className='mx-auto max-w-screen-md'>
-          <header className="my-8">
 
-          {roleUser ? <HeaderTitleUser/> : <HeaderTitleEmployees/>}
-          
-          <p className="max-w-screen-md mx-auto text-center text-gray-500 md:text-lg">
-          {stepText[step]}
-          </p>
+      <Modal4 isOpen={isModalOpen1}/> 
 
-          </header>
+      <Modal8 isOpen={isModalOpen2} />
 
-          <Modal4 isOpen={isModalOpen1} onClose={closeModal}/> 
+      {!isResponsable && (
+        <div className='mx-auto max-w-screen-md'>
+        <header className="my-8">
 
-          {msg1 && <Alert2 alert={alert2}/>}
+        {roleUser ? <HeaderTitleUser/> : <HeaderTitleEmployees/>}
+        
+        <p className="max-w-screen-md mx-auto text-center text-gray-500 md:text-lg">
+        {(roleUser && params.id) ? stepTextEditing[step] : stepText[step]}
+        </p>
 
-          {msg && <Alert alert={alert}/> }
+        </header>
 
-          {renderStepContent()}
+        {msg1 && <Alert2 alert={alert2}/>}
 
-          <div className='flex items-center justify-between mt-4'>
-              <div>
+        {msg && <Alert alert={alert}/> }
 
-                {step <= 1 && (
-                  
-                  <button
-                  to="/Bookings"
-                  className="
-                  inline-flex
-                  items-center
-                  px-6
-                  py-2
-                  text-sm text-gray-800
-                  rounded-lg
-                  shadow
-                  outline-none
-                  gap-x-1
-                  bg-gray-100
-                  hover:bg-gray-200
-                  "
-                  onClick={() => navigate(-1)}>Volver
-                  
-                </button>
+        {renderStepContent()}
 
-                )}
-              
-                  {step > 1 && (
-                      
-                  <button 
-                  className="
-                  inline-flex
-                  items-center
-                  px-6
-                  py-2
-                  text-sm text-gray-800
-                  rounded-lg
-                  shadow
-                  outline-none
-                  gap-x-1
-                  bg-gray-100
-                  hover:bg-gray-200
-                  "
-                  onClick={handlePreviousStep}
-                  >Paso Anterior</button>
-              
-                  )}
-              </div>
-              <div>
-                  {step < 3 ? (
-                  
-                  <button 
-                  className="
-                      px-6
-                      py-2
-                      text-sm text-white
-                  bg-emerald-700
-                      rounded-lg
-                      outline-none
-                  hover:bg-emerald-800
-                  ring-indigo-300
-                              "
-                  onClick={handleNextStep}>Siguiente Paso</button>
-                  
-                  )
-                  : (
-                    <button 
-                      className="
-                      px-6
-                      py-2
-                      text-sm text-white
-                      bg-emerald-700
-                      rounded-lg
-                      outline-none
-                      hover:bg-emerald-800
-                      ring-indigo-300"
-                      onClick={handleConfirmCita}
-                      disabled={isButtonDisabled}
-                      >{ params.id ? <span>Re-Agendar Cita</span> : <span>Confirmar Cita</span> }</button>        
-                  )}
-              </div>
-          </div>
+        {((roleUser && !params.id) || roleAdmission) && (
+           <div className='flex items-center justify-between mt-4'>
+           <div>
+
+             {step <= 1 && (
+               
+               <button
+               to="/Bookings"
+               className="
+               inline-flex
+               items-center
+               px-6
+               py-2
+               text-sm text-gray-800
+               rounded-lg
+               shadow
+               outline-none
+               gap-x-1
+               bg-gray-100
+               hover:bg-gray-200
+               "
+               onClick={() => navigate(-1)}>Volver
+               
+             </button>
+
+             )}
+           
+               {step > 1 && (
+                   
+               <button 
+               className="
+               inline-flex
+               items-center
+               px-6
+               py-2
+               text-sm text-gray-800
+               rounded-lg
+               shadow
+               outline-none
+               gap-x-1
+               bg-gray-100
+               hover:bg-gray-200
+               "
+               onClick={handlePreviousStep}
+               >Paso Anterior</button>
+           
+               )}
+           </div>
+           <div>
+               {step < 3 ? (
+               
+               <button 
+               className="
+                   px-6
+                   py-2
+                   text-sm text-white
+               bg-emerald-700
+                   rounded-lg
+                   outline-none
+               hover:bg-emerald-800
+               ring-indigo-300
+                           "
+               onClick={handleNextStep}>Siguiente Paso</button>
+               
+               )
+               : (
+                 <button 
+                   className="
+                   px-6
+                   py-2
+                   text-sm text-white
+                   bg-emerald-700
+                   rounded-lg
+                   outline-none
+                   hover:bg-emerald-800
+                   ring-indigo-300"
+                   onClick={handleConfirmCita}
+                   disabled={isButtonDisabled}
+                   >{ params.id ? <span>Re-Agendar Cita</span> : <span>Confirmar Cita</span> }</button>        
+               )}
+           </div>
+       </div>
+        )}
+
+        {(roleUser && params.id) && (
+           <div className='flex items-center justify-between mt-4'>
+           <div>
+
+             {step <= 1 && (
+               
+               <button
+               to="/Bookings"
+               className="
+               inline-flex
+               items-center
+               px-6
+               py-2
+               text-sm text-gray-800
+               rounded-lg
+               shadow
+               outline-none
+               gap-x-1
+               bg-gray-100
+               hover:bg-gray-200
+               "
+               onClick={() => navigate(-1)}>Volver
+               
+             </button>
+
+             )}
+           
+               {step > 1 && (
+                   
+               <button 
+               className="
+               inline-flex
+               items-center
+               px-6
+               py-2
+               text-sm text-gray-800
+               rounded-lg
+               shadow
+               outline-none
+               gap-x-1
+               bg-gray-100
+               hover:bg-gray-200
+               "
+               onClick={handlePreviousStep}
+               >Paso Anterior</button>
+           
+               )}
+           </div>
+           <div>
+               {step < 2 ? (
+               
+               <button 
+               className="
+                   px-6
+                   py-2
+                   text-sm text-white
+               bg-emerald-700
+                   rounded-lg
+                   outline-none
+               hover:bg-emerald-800
+               ring-indigo-300
+                           "
+               onClick={handleNextStep}>Siguiente Paso</button>
+               
+               )
+               : (
+                 <button 
+                   className="
+                   px-6
+                   py-2
+                   text-sm text-white
+                   bg-emerald-700
+                   rounded-lg
+                   outline-none
+                   hover:bg-emerald-800
+                   ring-indigo-300"
+                   onClick={handleConfirmCita}
+                   disabled={isButtonDisabled}
+                   >{ params.id ? <span>Re-Agendar Cita</span> : <span>Confirmar Cita</span> }</button>        
+               )}
+           </div>
+       </div>
+        )}
       </div>
+      )}
+    
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import costumerAxios from "../config/costumerAxios"
 import Alert from "../components/Alert"
 import { useNavigate } from "react-router-dom"
+import Modal8 from '../components/Modal8'
 
 const CreatePassword = () => {
 
@@ -14,6 +15,7 @@ const CreatePassword = () => {
   const params = useParams()
   const navigate = useNavigate()
   const {token} = params
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const checkToken = async () => {
@@ -85,6 +87,9 @@ const CreatePassword = () => {
     }
 
     try {
+
+      setIsModalOpen(true)
+
       const url = `/createpassword/${token}`
 
       const { data } = await costumerAxios.post(url, { password })
@@ -92,6 +97,8 @@ const CreatePassword = () => {
         msg: data.msg,
         error: false
       })
+
+      setIsModalOpen(false)
 
       setChangedPassword(true)
 
@@ -121,6 +128,7 @@ const CreatePassword = () => {
               <div className="mt-6 font-poppins">
                  
               { msg && <Alert alert={alert}/> }
+              <Modal8 isOpen={isModalOpen} />
 
               { tokenValid && ( <form onSubmit={handleSubmit} className="space-y-1">
                     <div>
