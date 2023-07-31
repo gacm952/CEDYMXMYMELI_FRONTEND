@@ -207,7 +207,7 @@ const Register = () => {
         return;
       }
 
-      const lowerCaseEmail = email ? toLowerCaseEmail(email) : undefined;
+      const lowerCaseEmail = email ? toLowerCaseEmail(email) : "";
 
       setAlert({})
 
