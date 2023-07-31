@@ -66,7 +66,7 @@ function Calendar({ onDateChange, onTimeChange }) {
   };
 
   const shouldDisableTime = (selectedTime) => {
-    const minHour = 8;
+    const minHour = 14;
     const maxHour = 18;
     const restStartHour = 12;
     const restEndHour = 14;
@@ -130,7 +130,7 @@ function Calendar({ onDateChange, onTimeChange }) {
             <DigitalClock 
               skipDisabled
               orientation="landscape"
-              timeStep={15}
+              timeStep={20}
               shouldDisableTime={shouldDisableTime}
               value={value}
               onChange={handleTimeChange}

@@ -203,7 +203,7 @@ const Stepper = () => {
     const haveMotiveMI = bookingAuth.some(booking => booking.Motive === "Medicina Interna Primera vez");
     const haveMotiveMIG = bookingAuth.some(booking => booking.Motive === "Medicina Integral Primera vez");
     const haveMotivePG = bookingAuth.some(booking => booking.Motive === "Psicologia Primera vez");
-    const haveMotiveCV = bookingAuth.some(booking => booking.Motive === "Cita Valorativa Primera vez");
+    const haveMotiveCV = bookingAuth.some(booking => booking.Motive === "Valoración Primera vez");
     const haveMotiveMG = bookingAuth.some(booking => booking.Motive === "Medicina General Primera vez");
     const haveMotiveG = bookingAuth.some(booking => booking.Motive === "Ginecologia Primera vez");
 
@@ -220,8 +220,8 @@ const Stepper = () => {
       updatedMotive = "Medicina Integral Control";
     } else if (haveMotivePG && Motive === "Psicologia Primera vez") {
       updatedMotive = "Psicologia Control";
-    } else if (haveMotiveCV && Motive === "Cita Valorativa Primera vez") {
-      updatedMotive = "Cita Valorativa Control";
+    } else if (haveMotiveCV && Motive === "Valoración Primera vez") {
+      updatedMotive = "Valoración Control";
     } else if (haveMotiveMG && Motive === "Medicina General Primera vez") {
       updatedMotive = "Medicina General Control";
     } else if (haveMotiveG && Motive === "Ginecologia Primera vez") {
@@ -510,7 +510,7 @@ const Stepper = () => {
                     >
                         <option value="" hidden>Selecciona Una Opción</option>
                         {showCitaValorativa && (
-                        <option value="Cita Valorativa Primera vez">Cita Valorativa</option>
+                        <option value="Valoración Primera vez">Valoración</option>
                         )}
                         {!isVisitadorMedico && (
                           <option value="Medicina General Primera vez">Medicina General</option>
