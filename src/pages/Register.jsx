@@ -4,8 +4,8 @@ import Alert from '../components/Alert'
 import Alert2 from '../components/Alert2'
 import costumerAxios from '../config/costumerAxios'
 import useAuth from '../hooks/useAuth'
-import Modal8 from '../components/Modal8'
 import CalendarRegister from '../components/CalendarRegister'
+import Modal8 from '../components/Modal8'
 
 const Register = () => {
 
@@ -29,10 +29,17 @@ const Register = () => {
   const { auth, allUsers } = useAuth();
   const [alert, setAlert] = useState({});
   const [alert2, setAlert2] = useState({});
-  const [fathersForm, setfathersForm] = useState(false);
+  const [fathersForm, setFathersForm] = useState(false);
   const [emailMask, setEmailMask] = useState('');
   const [isRegistered, setIsRegistered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [typeDocument3, setTypeDocument3] = useState('')
+  const [document1, setDocument1] = useState('')
+  const [name1, setName1] = useState('')
+  const [secondName1, setSecondName1] = useState('')
+  const [lastName1, setLastName1] = useState('')
+  const [secondLastName1, setSecondLastName1] = useState('')
 
   const navigate = useNavigate();
   const roleUser = [auth].some((role) => role.role === "User")
@@ -143,19 +150,19 @@ const Register = () => {
       }
 
       if ([typeDocument, document, name, lastName, 
-          phoneNumber, address, dateOfBirth, 
-          civilStatus, typeOfBlood].includes('')) {
-        setAlert({
-          msg: 'todos los campos son obligatorios',
-          error: true,
-        })
-        return 
-      }
+           phoneNumber, address, dateOfBirth, 
+           civilStatus, typeOfBlood].includes('')) {
+      setAlert({
+        msg: 'todos los campos son obligatorios',
+        error: true,
+      })
+      return 
+    }
 
       const isDocumentValid = /^\d+$/.test(document);
       const isPhoneNumberValid = /^\d+$/.test(phoneNumber);
       const isNameValid = /^[A-Za-z]+$/.test(name);
-      const isSecondNameValid = /^$|^[A-Za-z]+$/.test(secondName);
+      const isSecondNameValid =/^$|^[A-Za-z]+$/.test(secondName);
       const isLastNameValid = /^[A-Za-z]+$/.test(lastName);
       const isSecondLastNameValid = /^$|^[A-Za-z]+$/.test(secondLastName);
 
@@ -209,6 +216,7 @@ const Register = () => {
 
       const lowerCaseEmail = email ? toLowerCaseEmail(email) : "";
 
+
       setAlert({})
 
       // Crear el User
@@ -231,12 +239,19 @@ const Register = () => {
           dateOfBirth, 
           civilStatus, 
           typeOfBlood, 
-          registeredBy: auth._id }) 
+          registeredBy: auth._id,
+            parentTypeOfDocument: typeDocument3,
+            additionalField2: document1,
+            parentName: name1,
+            parentSecondName: secondName1,
+            parentLastName: lastName1,
+            parentLastSecondName: secondLastName1,
+        }) 
 
         await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document, typeDocument: typeDocument })
 
         setIsModalOpen(false)
-      
+
         setAlert({
           msg: data.msg,
           error: false
@@ -276,6 +291,8 @@ const Register = () => {
           msg: error.response.data.msg,
           error: true
         })
+
+        setIsModalOpen(false)
       }
     }
 
@@ -323,15 +340,6 @@ const Register = () => {
       }
   }
 
- {/* const handleChildrenDocumento = (event) => {
-    setDocumento(event.target.value);
-    if (event.target.value === "Tarjeta de Identidad") {
-      setfathersForm(true);
-    } else {
-      setfathersForm(false);
-    }
-  };  */} 
-
   const {msg} = alert
 
   const {msg:msg1} = alert2
@@ -342,7 +350,8 @@ const Register = () => {
     {roleAdmission && (
         <section className='w-full min-h-screen flex-grow flex justify-center items-center'>
 
-          <Modal8 isOpen={isModalOpen} onClose={closeModal} />
+        <Modal8 isOpen={isModalOpen} onClose={closeModal} />
+
                     
           <div className='grid grid-cols-2 items-center'>
 
@@ -414,93 +423,32 @@ const Register = () => {
                       <div className="mt-6 font-poppins">
                         <form onSubmit={handleSubmit} className="space-y-1" >
                               <div className="mb-2 grid grid-cols-1 lg:grid-cols-2 lg:gap-3">
-                            
-                              <div className=''>
-                                <label htmlFor="documento" className="block font-semibold font text-gray-700">
-                                Tipo de Documento 
-                                </label>
-                                <select
-                                  id="documento"
-                                  className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                  value={typeDocument}
-                                  onChange={e => setTypeDocument(e.target.value)}
-    
-                                >
-                                  <option value="" hidden>Tipo de Documento</option>
-                                  <option value="CC">Cédula de Ciudadanía</option>
-                                  <option value="TI">Tarjeta de Identidad</option>
-                                  <option value="RUT">Registro Único Tributario</option>
-                                  <option value="CE">Cédula de Extranjería</option>
-                                  <option value="RCN">Registro Civil de Nacimiento</option>
-                                  <option value="NIT">Numero de Identificación Tributaria</option>
-                                  <option value="PEP">Permiso Especial de Permanencia</option>
-                                  <option value="PPT">Permiso de Protección Temporal</option>
-                                  <option value="P">Pasaporte</option>
-                                  <option value="LM">Libreta Militar</option>
-                                  <option value="ESI">Extranjero Sin Identificación</option>
-
-                                </select>
-                              </div>
-                              
-                              {fathersForm && (
-                                  <>
-                                  <div>
-                                    <label htmlFor="input1" className="block font-medium text-gray-700">
-                                      # Documento
-                                    </label>
-                                    <input
-                                      id="input1"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label htmlFor="input2" className="block font-medium text-gray-700">
-                                      Primer Nombre
-                                    </label>
-                                    <input
-                                      id="input2"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-                                    <div>
-                                    <label htmlFor="input3" className="block font-medium text-gray-700">
-                                      Segundo Nombre
-                                    </label>
-                                    <input
-                                      id="input3"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-                                    <div>
-                                    <label htmlFor="input4" className="block font-medium text-gray-700">
-                                      Primer Apellido 
-                                    </label>
-                                    <input
-                                      id="input4"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-                                    <div>
-                                    <label htmlFor="input5" className="block font-medium text-gray-700">
-                                      Segundo Apellido
-                                    </label>
-                                    <input
-                                      id="input5"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-
-                                    
-                                    <p className='col-span-2 text-center my-6'>Datos del representante legal</p>
-                                    
-                                  </>  
-                                )}
+                                  <div className=''>
+                                  <label htmlFor="documento" className="block font-semibold font text-gray-700">
+                                  Tipo de Documento 
+                                  </label>
+                                  <select
+                                    id="documento"
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    value={typeDocument}
+                                    onChange={(e) => {
+                                      setTypeDocument(e.target.value);
+                                    }}      
+                                  >
+                                    <option value="" hidden>Tipo de Documento</option>
+                                    <option value="CC">Cédula de Ciudadanía</option>
+                                    <option value="TI">Tarjeta de Identidad</option>
+                                    <option value="RUT">Registro Único Tributario</option>
+                                    <option value="CE">Cédula de Extranjería</option>
+                                    <option value="RCN">Registro Civil de Nacimiento</option>
+                                    <option value="NIT">Numero de Identificación Tributaria</option>
+                                    <option value="PEP">Permiso Especial de Permanencia</option>
+                                    <option value="PPT">Permiso de Protección Temporal</option>
+                                    <option value="P">Pasaporte</option>
+                                    <option value="LM">Libreta Militar</option>
+                                    <option value="ESI">Extranjero Sin Identificación</option>
+                                  </select>
+                                </div>              
 
                                 <div className=''>
                                     <label 
@@ -577,36 +525,41 @@ const Register = () => {
                                   />
                                 </div>
 
-                                <div>
-                                  <label 
-                                  htmlFor="email" 
-                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0">Email
-                                  </label>
-                                  <input
-                                    autoComplete="on"
-                                    id='email' 
-                                    type="email" 
-                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    placeholder="Email"
-                                    value = {email}
-                                    onChange = {e => setEmail(e.target.value)}
-                                  />
-                                </div> 
+                                 {!(typeDocument === "TI") && (
+                                  <>
+                                    <div>
+                                    <label 
+                                    htmlFor="email" 
+                                    className="block font-semibold text-gray-700 mt-2 lg:mt-0">Email
+                                    </label>
+                                    <input
+                                      autoComplete="on"
+                                      id='email' 
+                                      type="email" 
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      placeholder="Email"
+                                      value = {email}
+                                      onChange = {e => setEmail(e.target.value)}
+                                    />
+                                  </div>
 
-                                <div>
-                                  <label 
-                                  htmlFor="phoneNumber" 
-                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0"># Teléfono
-                                  </label>
-                                  <input 
-                                    id='phoneNumber'
-                                    type="text" 
-                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    placeholder="# Teléfono"
-                                    value = {phoneNumber}
-                                    onChange = {e => setPhoneNumber(e.target.value)} 
-                                  />
-                                </div>     
+                                  <div>
+                                    <label 
+                                    htmlFor="phoneNumber" 
+                                    className="block font-semibold text-gray-700 mt-2 lg:mt-0"># Teléfono
+                                    </label>
+                                    <input 
+                                      id='phoneNumber'
+                                      type="text" 
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      placeholder="# Teléfono"
+                                      value = {phoneNumber}
+                                      onChange = {e => setPhoneNumber(e.target.value)} 
+                                    />
+                                  </div>  
+                                </>
+
+                                 )}                          
 
                                 <div>
                                   <label 
@@ -634,7 +587,7 @@ const Register = () => {
                                   value={dateOfBirth}
                                   onChange={(newValue) => setDateOfBirth(newValue)}/>
                                   </div>
-                                </div>      
+                                </div>    
 
                                 <div>
                                   <label 
@@ -686,6 +639,142 @@ const Register = () => {
                                 </select>
                                 
                                 </div>
+
+                                { typeDocument === "TI" && (
+                                  <>
+
+                                  <p className='col-span-2 text-center block font-semibold text-gray-700 my-4'>Datos del Representante</p>
+
+                                  </>
+                              )}
+
+                                { typeDocument === "TI" && (
+                                  <>
+                                    <div className=''>
+                                  <label htmlFor="documento" className="block font-semibold font text-gray-700">
+                                  Tipo de Documento 
+                                  </label>
+                                  <select
+                                    id="documento"
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    value={typeDocument3}
+                                    onChange={(e) => {
+                                      setTypeDocument3(e.target.value);
+                                    }}      
+                                  >
+                                    <option value="" hidden>Tipo de Documento</option>
+                                    <option value="CC">Cédula de Ciudadanía</option>
+                                    <option value="TI">Tarjeta de Identidad</option>
+                                    <option value="RUT">Registro Único Tributario</option>
+                                    <option value="CE">Cédula de Extranjería</option>
+                                    <option value="RCN">Registro Civil de Nacimiento</option>
+                                    <option value="NIT">Numero de Identificación Tributaria</option>
+                                    <option value="PEP">Permiso Especial de Permanencia</option>
+                                    <option value="PPT">Permiso de Protección Temporal</option>
+                                    <option value="P">Pasaporte</option>
+                                    <option value="LM">Libreta Militar</option>
+                                    <option value="ESI">Extranjero Sin Identificación</option>
+                                  </select>
+                                </div>  
+
+                                  <div>
+                                    <label 
+                                    htmlFor="Documento1" 
+                                    className="block font-medium text-gray-700">
+                                      # Documento
+                                    </label>
+                                    <input
+                                      id="Documento1"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {document1}
+                                      onChange = {e => setDocument1(e.target.value)}
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label htmlFor="name1" className="block font-medium text-gray-700">
+                                      Primer Nombre
+                                    </label>
+                                    <input
+                                      id="name1"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {name1}
+                                      onChange = {e => setName1(e.target.value)}
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="secondName" className="block font-medium text-gray-700">
+                                      Segundo Nombre
+                                    </label>
+                                    <input
+                                      id="secondName"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {secondName1}
+                                      onChange = {e => setSecondName1(e.target.value)}
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="lastName1" className="block font-medium text-gray-700">
+                                      Primer Apellido 
+                                    </label>
+                                    <input
+                                      id="lastName1"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {lastName1}
+                                      onChange = {e => setLastName1(e.target.value)}
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="secondLastName1" className="block font-medium text-gray-700">
+                                      Segundo Apellido
+                                    </label>
+                                    <input
+                                      id="secondLastName1"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {secondLastName1}
+                                      onChange = {e => setSecondLastName1(e.target.value)}
+                                   />
+                                    </div>
+
+                                    <div>
+                                  <label 
+                                  htmlFor="email" 
+                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0">Email
+                                  </label>
+                                  <input
+                                    autoComplete="on"
+                                    id='email' 
+                                    type="email" 
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Email"
+                                    value = {email}
+                                    onChange = {e => setEmail(e.target.value)}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label 
+                                  htmlFor="phoneNumber" 
+                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0"># Teléfono
+                                  </label>
+                                  <input 
+                                    id='phoneNumber'
+                                    type="text" 
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="# Teléfono"
+                                    value = {phoneNumber}
+                                    onChange = {e => setPhoneNumber(e.target.value)} 
+                                  />
+                                </div>     
+
+                                                            
+                                  </>  
+                                )}
                                                                       
                           </div>
                           <div>
@@ -704,7 +793,7 @@ const Register = () => {
 
     {!roleAdmission && (
         <div className="flex justify-center items-center mx-auto max-w-screen-2xl px-4 py-6 sm:pb-8 sm:pt-20 sm:px-6 lg:px-8">  
-          <Modal8 isOpen={isModalOpen} onClose={closeModal} /> 
+        <Modal8 isOpen={isModalOpen} onClose={closeModal} />
         <div className="grid">
           <div className="flex justify-center max-w-2xl shadow-md shadow-gray-600 border-2 border-emerald-600 rounded-3xl">
             <div className="p-8 sm:p-16 lg:py-24 lg:px-16">
@@ -747,65 +836,65 @@ const Register = () => {
                                   </select>
                                 </div>
                                 
-                                {fathersForm && (
-                                    <>
-                                    <div>
-                                      <label htmlFor="input1" className="block font-medium text-gray-700">
-                                        # Documento
-                                      </label>
-                                      <input
-                                        id="input1"
-                                        type="text"
-                                        className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                      />
+                                { typeDocument === "TI" && (
+                                  <>
+                                  <div>
+                                    <label htmlFor="input1" className="block font-medium text-gray-700">
+                                      # Documento
+                                    </label>
+                                    <input
+                                      id="input1"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label htmlFor="input2" className="block font-medium text-gray-700">
+                                      Primer Nombre
+                                    </label>
+                                    <input
+                                      id="input2"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
                                     </div>
-  
                                     <div>
-                                      <label htmlFor="input2" className="block font-medium text-gray-700">
-                                        Primer Nombre
-                                      </label>
-                                      <input
-                                        id="input2"
-                                        type="text"
-                                        className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                      />
-                                      </div>
-                                      <div>
-                                      <label htmlFor="input3" className="block font-medium text-gray-700">
-                                        Segundo Nombre
-                                      </label>
-                                      <input
-                                        id="input3"
-                                        type="text"
-                                        className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                      />
-                                      </div>
-                                      <div>
-                                      <label htmlFor="input4" className="block font-medium text-gray-700">
-                                        Primer Apellido 
-                                      </label>
-                                      <input
-                                        id="input4"
-                                        type="text"
-                                        className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                      />
-                                      </div>
-                                      <div>
-                                      <label htmlFor="input5" className="block font-medium text-gray-700">
-                                        Segundo Apellido
-                                      </label>
-                                      <input
-                                        id="input5"
-                                        type="text"
-                                        className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                      />
-                                      </div>
-  
-                                      
-                                      <p className='col-span-2 text-center my-6'>Datos del representante legal</p>
-                                      
-                                    </>  
-                                  )}
+                                    <label htmlFor="input3" className="block font-medium text-gray-700">
+                                      Segundo Nombre
+                                    </label>
+                                    <input
+                                      id="input3"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="input4" className="block font-medium text-gray-700">
+                                      Primer Apellido 
+                                    </label>
+                                    <input
+                                      id="input4"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="input5" className="block font-medium text-gray-700">
+                                      Segundo Apellido
+                                    </label>
+                                    <input
+                                      id="input5"
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    />
+                                    </div>
+
+                                    
+                                    <p className='col-span-2 text-center my-6'>Datos del representante legal</p>
+                                    
+                                  </>  
+                                )}
   
                                   <div className=''>
                                       <label 
@@ -928,18 +1017,19 @@ const Register = () => {
                                     />
                                   </div>  
   
-                                  <div>
-                                    <label 
-                                    htmlFor="dateOfBirth" 
-                                    className="block font-semibold text-gray-700 mt-2 lg:mt-0">Fecha de Nacimiento
-                                    </label>
-                                    
-                                    <div className='mt-2'>
-                                    <CalendarRegister
-                                    value={dateOfBirth}
-                                    onChange={(newValue) => setDateOfBirth(newValue)}/>
-                                    </div>
-                                  </div>    
+                                 
+                                <div>
+                                  <label 
+                                  htmlFor="dateOfBirth" 
+                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0">Fecha de Nacimiento
+                                  </label>
+                                  
+                                  <div className='mt-2'>
+                                  <CalendarRegister
+                                  value={dateOfBirth}
+                                  onChange={(newValue) => setDateOfBirth(newValue)}/>
+                                  </div>
+                                </div>     
   
                                   <div>
                                     <label 
@@ -1041,10 +1131,10 @@ const Register = () => {
                   </form>
                 )}             
 
-                {isRegistered && (
-                  <div>
-                 <p className='text-2xl shadow-md text-white bg-emerald-700 shadow-gray-600 border-2 border-emerald-600 rounded-3xl p-4 text-center font-extrabold font-poppins'>
-                  Correo enviado, por favor revisa tu bandeja de entrada al {emailMask} y sigue los pasos indicados para confirmar tu cuenta.</p>
+                {isRegistered && (            
+                  <div className='shadow-md text-lg text-white bg-emerald-700 shadow-gray-600 border-2 border-emerald-600 rounded-3xl p-4 text-center font-extrabold font-poppins mb-12'>
+                  <h2 className='text-2xl mb-4'>Correo enviado</h2>
+                  <p>Por favor revisa tu bandeja de entrada al {emailMask} y sigue los pasos indicados para confirmar tu cuenta.</p> 
                   </div>
                 )} 
                 </div>

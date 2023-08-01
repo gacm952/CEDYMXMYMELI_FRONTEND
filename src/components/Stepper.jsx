@@ -533,6 +533,19 @@ const Stepper = () => {
                     >
                         <option value="" hidden>Selecciona una opción</option>
                         <option value="Boehringer Ingelheim">Boehringer Ingelheim</option>
+                        <option value="Lilly">Lilly</option>
+                        <option value="NovoNordisk">NovoNordisk</option>
+                        <option value="MK">MK</option>
+                        <option value="Pfizer">Pfizer</option>
+                        <option value="Sanofi">Sanofi</option>
+                        <option value="Siegfried">Siegfried</option>
+                        <option value="Diabetrics">Diabetrics</option>
+                        <option value="Procaps">Procaps</option>
+                        <option value="Closter Farma">Closter Farma</option>
+                        <option value="Bayer">Bayer</option>
+                        <option value="Euroetika">Euroetika</option>
+                        <option value="Huma Farmacéutica">Huma Farmacéutica</option>
+                        <option value="Abbott">Abbott</option>
                     </select>
                 </div>
               )}

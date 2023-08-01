@@ -66,7 +66,7 @@ function Calendar({ onDateChange, onTimeChange }) {
   };
 
   const shouldDisableTime = (selectedTime) => {
-    const minHour = 14;
+    const minHour = 15;
     const maxHour = 18;
     const restStartHour = 12;
     const restEndHour = 14;
