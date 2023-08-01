@@ -50,6 +50,7 @@ const Stepper = () => {
   const isResponsable = [auth].some((role) => role.responsable === true)
   const bookingData = allBookings.find(booking => booking._id === params.id) 
   const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
+  const bookingUserAuth = allBookings.filter(booking => booking.bookingTo === foundUserId)
 
   useEffect(() => {
     if (params.id) {
@@ -208,29 +209,67 @@ const Stepper = () => {
     const haveMotiveMG = bookingAuth.some(booking => booking.Motive === "Medicina General Primera vez");
     const haveMotiveG = bookingAuth.some(booking => booking.Motive === "Ginecologia Primera vez");
 
-    const formattedDateHour = format(dateHour, 'dd/MM/yyyy HH:mm:ss');
+    const haveMotiveNutriAd = bookingUserAuth.some(booking => booking.Motive === "Nutricion Primera vez");
+    const haveMotiveMIAd = bookingUserAuth.some(booking => booking.Motive === "Medicina Interna Primera vez");
+    const haveMotiveMIGAd = bookingUserAuth.some(booking => booking.Motive === "Medicina Integral Primera vez");
+    const haveMotivePGAd = bookingUserAuth.some(booking => booking.Motive === "Psicologia Primera vez");
+    const haveMotiveCVAd = bookingUserAuth.some(booking => booking.Motive === "Valoración Primera vez");
+    const haveMotiveMGAd = bookingUserAuth.some(booking => booking.Motive === "Medicina General Primera vez");
+    const haveMotiveGAd = bookingUserAuth.some(booking => booking.Motive === "Ginecologia Primera vez");
     
-    // Determinar el valor adecuado para la propiedad Motive
+
+    const formattedDateHour = format(dateHour, 'dd/MM/yyyy HH:mm:ss');
+
     let updatedMotive;
 
-    if (haveMotiveNutri && Motive === "Nutricion Primera vez") {
-      updatedMotive = "Nutricion Control";
-    } else if (haveMotiveMI && Motive === "Medicina Interna Primera vez") {
-      updatedMotive = "Medicina Interna Control";
-    } else if (haveMotiveMIG && Motive === "Medicina Integral Primera vez") {
-      updatedMotive = "Medicina Integral Control";
-    } else if (haveMotivePG && Motive === "Psicologia Primera vez") {
-      updatedMotive = "Psicologia Control";
-    } else if (haveMotiveCV && Motive === "Valoración Primera vez") {
-      updatedMotive = "Valoración Control";
-    } else if (haveMotiveMG && Motive === "Medicina General Primera vez") {
-      updatedMotive = "Medicina General Control";
-    } else if (haveMotiveG && Motive === "Ginecologia Primera vez") {
-      updatedMotive = "Ginecologia Control";
-    } else {     
-        // Si no tiene ninguna cita en ninguna especialidad, entonces mostrar "Nuevo Paciente" para la especialidad actual
-        updatedMotive = `${Motive}`;   
+
+    if (roleAdmission) {
+
+      // Determinar el valor adecuado para la propiedad Motive
+
+      if (haveMotiveNutriAd && Motive === "Nutricion Primera vez") {
+        updatedMotive = "Nutricion Control";
+      } else if (haveMotiveMIAd && Motive === "Medicina Interna Primera vez") {
+        updatedMotive = "Medicina Interna Control";
+      } else if (haveMotiveMIGAd && Motive === "Medicina Integral Primera vez") {
+        updatedMotive = "Medicina Integral Control";
+      } else if (haveMotivePGAd && Motive === "Psicologia Primera vez") {
+        updatedMotive = "Psicologia Control";
+      } else if (haveMotiveCVAd && Motive === "Valoración Primera vez") {
+        updatedMotive = "Valoración Control";
+      } else if (haveMotiveMGAd && Motive === "Medicina General Primera vez") {
+        updatedMotive = "Medicina General Control";
+      } else if (haveMotiveGAd && Motive === "Ginecologia Primera vez") {
+        updatedMotive = "Ginecologia Control";
+      } else {     
+
+          // Si no tiene ninguna cita en ninguna especialidad, entonces mostrar "Nuevo Paciente" para la especialidad actual
+          updatedMotive = `${Motive}`;   
+      }
+    } else {
+      
+        // Determinar el valor adecuado para la propiedad Motive
+
+        if (haveMotiveNutri && Motive === "Nutricion Primera vez") {
+          updatedMotive = "Nutricion Control";
+        } else if (haveMotiveMI && Motive === "Medicina Interna Primera vez") {
+          updatedMotive = "Medicina Interna Control";
+        } else if (haveMotiveMIG && Motive === "Medicina Integral Primera vez") {
+          updatedMotive = "Medicina Integral Control";
+        } else if (haveMotivePG && Motive === "Psicologia Primera vez") {
+          updatedMotive = "Psicologia Control";
+        } else if (haveMotiveCV && Motive === "Valoración Primera vez") {
+          updatedMotive = "Valoración Control";
+        } else if (haveMotiveMG && Motive === "Medicina General Primera vez") {
+          updatedMotive = "Medicina General Control";
+        } else if (haveMotiveG && Motive === "Ginecologia Primera vez") {
+          updatedMotive = "Ginecologia Control";
+        } else {     
+            // Si no tiene ninguna cita en ninguna especialidad, entonces mostrar "Nuevo Paciente" para la especialidad actual
+            updatedMotive = `${Motive}`;   
+        }
     }
+    
 
     const target = bookingData?.bookingTo || bookingData?.bookingFor || auth._id
 
@@ -254,6 +293,7 @@ const Stepper = () => {
       if (id !== null) {
         bookingData.id = id;
       }
+      
 
       submitBooking(bookingData, {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
 

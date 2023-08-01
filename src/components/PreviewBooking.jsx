@@ -138,7 +138,7 @@ const { msg } = alert
             <span className="max-w-max">
               <button 
               onClick={handleEditBooking} 
-              >Modificar</button>
+              >ReAgendar</button>
             </span>
           </div>
         </div>
