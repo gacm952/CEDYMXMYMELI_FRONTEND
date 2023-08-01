@@ -214,6 +214,17 @@ const Register = () => {
         return;
       }
 
+      if(typeDocument === "TI") {
+        if ([typeDocument3, document1, name1, 
+          lastName1].includes('')) {
+              setAlert({
+                msg: 'todos los campos son obligatorios',
+                error: true,
+              })
+              return 
+            }
+      }
+
       const lowerCaseEmail = email ? toLowerCaseEmail(email) : "";
 
 
@@ -240,6 +251,7 @@ const Register = () => {
           civilStatus, 
           typeOfBlood, 
           registeredBy: auth._id,
+          ...(typeDocument === 'TI' && {
             parentTypeOfDocument: typeDocument3,
             additionalField2: document1,
             parentName: name1,
@@ -247,6 +259,7 @@ const Register = () => {
             parentLastName: lastName1,
             parentLastSecondName: secondLastName1,
         }) 
+      }) 
 
         await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document, typeDocument: typeDocument })
 
@@ -285,6 +298,12 @@ const Register = () => {
         setPassword('')
         setLegalTerms(false)
         setConfirmPassword('')
+        setTypeDocument3('')
+        setDocument1('')
+        setName1('')
+        setSecondName1('')
+        setLastName1('')
+        setSecondLastName1('')
 
       } catch (error) {
         setAlert({
@@ -643,8 +662,10 @@ const Register = () => {
                                 { typeDocument === "TI" && (
                                   <>
 
-                                  <p className='col-span-2 text-center block font-semibold text-gray-700 my-4'>Datos del Representante</p>
+                                  <div className='col-span-1 lg:col-span-2'>
 
+                                  <p className=' text-center block font-semibold text-gray-700 my-4'>Datos del Representante</p>
+                                  </div>
                                   </>
                               )}
 
@@ -685,6 +706,7 @@ const Register = () => {
                                     </label>
                                     <input
                                       id="Documento1"
+                                      placeholder='# Documento'
                                       type="text"
                                       className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       value = {document1}
@@ -699,6 +721,7 @@ const Register = () => {
                                     <input
                                       id="name1"
                                       type="text"
+                                      placeholder='Primer Nombre'
                                       className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       value = {name1}
                                       onChange = {e => setName1(e.target.value)}
@@ -711,6 +734,7 @@ const Register = () => {
                                     <input
                                       id="secondName"
                                       type="text"
+                                      placeholder='Segundo Nombre'
                                       className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       value = {secondName1}
                                       onChange = {e => setSecondName1(e.target.value)}
@@ -723,6 +747,7 @@ const Register = () => {
                                     <input
                                       id="lastName1"
                                       type="text"
+                                      placeholder='Primer Apellido'
                                       className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       value = {lastName1}
                                       onChange = {e => setLastName1(e.target.value)}
@@ -735,6 +760,7 @@ const Register = () => {
                                     <input
                                       id="secondLastName1"
                                       type="text"
+                                      placeholder='Segundo Apellido'
                                       className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                       value = {secondLastName1}
                                       onChange = {e => setSecondLastName1(e.target.value)}
@@ -836,66 +862,6 @@ const Register = () => {
                                   </select>
                                 </div>
                                 
-                                { typeDocument === "TI" && (
-                                  <>
-                                  <div>
-                                    <label htmlFor="input1" className="block font-medium text-gray-700">
-                                      # Documento
-                                    </label>
-                                    <input
-                                      id="input1"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                  </div>
-
-                                  <div>
-                                    <label htmlFor="input2" className="block font-medium text-gray-700">
-                                      Primer Nombre
-                                    </label>
-                                    <input
-                                      id="input2"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-                                    <div>
-                                    <label htmlFor="input3" className="block font-medium text-gray-700">
-                                      Segundo Nombre
-                                    </label>
-                                    <input
-                                      id="input3"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-                                    <div>
-                                    <label htmlFor="input4" className="block font-medium text-gray-700">
-                                      Primer Apellido 
-                                    </label>
-                                    <input
-                                      id="input4"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-                                    <div>
-                                    <label htmlFor="input5" className="block font-medium text-gray-700">
-                                      Segundo Apellido
-                                    </label>
-                                    <input
-                                      id="input5"
-                                      type="text"
-                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    />
-                                    </div>
-
-                                    
-                                    <p className='col-span-2 text-center my-6'>Datos del representante legal</p>
-                                    
-                                  </>  
-                                )}
-  
                                   <div className=''>
                                       <label 
                                       htmlFor="Documento" 
@@ -971,7 +937,9 @@ const Register = () => {
                                     />
                                   </div>
   
-                                  <div>
+                                  {!(typeDocument === "TI") && (
+                                  <>
+                                    <div>
                                     <label 
                                     htmlFor="email" 
                                     className="block font-semibold text-gray-700 mt-2 lg:mt-0">Email
@@ -985,8 +953,8 @@ const Register = () => {
                                       value = {email}
                                       onChange = {e => setEmail(e.target.value)}
                                     />
-                                  </div> 
-  
+                                  </div>
+
                                   <div>
                                     <label 
                                     htmlFor="phoneNumber" 
@@ -1000,7 +968,10 @@ const Register = () => {
                                       value = {phoneNumber}
                                       onChange = {e => setPhoneNumber(e.target.value)} 
                                     />
-                                  </div>     
+                                  </div>  
+                                </>
+
+                                 )}       
   
                                   <div>
                                     <label 
@@ -1080,6 +1051,149 @@ const Register = () => {
   
                                   </select>                              
                                   </div>
+
+                                  { typeDocument === "TI" && (
+                                  <>
+
+                                  <div className='col-span-1 lg:col-span-2'>
+
+                                  <p className=' text-center block font-semibold text-gray-700 my-4'>Datos del Representante</p>
+                                  </div>
+                                  </>
+                              )}
+
+{ typeDocument === "TI" && (
+                                  <>
+                                    <div className=''>
+                                  <label htmlFor="documento" className="block font-semibold font text-gray-700">
+                                  Tipo de Documento 
+                                  </label>
+                                  <select
+                                    id="documento"
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    value={typeDocument3}
+                                    onChange={(e) => {
+                                      setTypeDocument3(e.target.value);
+                                    }}      
+                                  >
+                                    <option value="" hidden>Tipo de Documento</option>
+                                    <option value="CC">Cédula de Ciudadanía</option>
+                                    <option value="TI">Tarjeta de Identidad</option>
+                                    <option value="RUT">Registro Único Tributario</option>
+                                    <option value="CE">Cédula de Extranjería</option>
+                                    <option value="RCN">Registro Civil de Nacimiento</option>
+                                    <option value="NIT">Numero de Identificación Tributaria</option>
+                                    <option value="PEP">Permiso Especial de Permanencia</option>
+                                    <option value="PPT">Permiso de Protección Temporal</option>
+                                    <option value="P">Pasaporte</option>
+                                    <option value="LM">Libreta Militar</option>
+                                    <option value="ESI">Extranjero Sin Identificación</option>
+                                  </select>
+                                </div>  
+
+                                  <div>
+                                    <label 
+                                    htmlFor="Documento1" 
+                                    className="block font-medium text-gray-700">
+                                      # Documento
+                                    </label>
+                                    <input
+                                      id="Documento1"
+                                      placeholder='# Documento'
+                                      type="text"
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {document1}
+                                      onChange = {e => setDocument1(e.target.value)}
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label htmlFor="name1" className="block font-medium text-gray-700">
+                                      Primer Nombre
+                                    </label>
+                                    <input
+                                      id="name1"
+                                      type="text"
+                                      placeholder='Primer Nombre'
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {name1}
+                                      onChange = {e => setName1(e.target.value)}
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="secondName" className="block font-medium text-gray-700">
+                                      Segundo Nombre
+                                    </label>
+                                    <input
+                                      id="secondName"
+                                      type="text"
+                                      placeholder='Segundo Nombre'
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {secondName1}
+                                      onChange = {e => setSecondName1(e.target.value)}
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="lastName1" className="block font-medium text-gray-700">
+                                      Primer Apellido 
+                                    </label>
+                                    <input
+                                      id="lastName1"
+                                      type="text"
+                                      placeholder='Primer Apellido'
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {lastName1}
+                                      onChange = {e => setLastName1(e.target.value)}
+                                    />
+                                    </div>
+                                    <div>
+                                    <label htmlFor="secondLastName1" className="block font-medium text-gray-700">
+                                      Segundo Apellido
+                                    </label>
+                                    <input
+                                      id="secondLastName1"
+                                      type="text"
+                                      placeholder='Segundo Apellido'
+                                      className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                      value = {secondLastName1}
+                                      onChange = {e => setSecondLastName1(e.target.value)}
+                                   />
+                                    </div>
+
+                                    <div>
+                                  <label 
+                                  htmlFor="email" 
+                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0">Email
+                                  </label>
+                                  <input
+                                    autoComplete="on"
+                                    id='email' 
+                                    type="email" 
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="Email"
+                                    value = {email}
+                                    onChange = {e => setEmail(e.target.value)}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label 
+                                  htmlFor="phoneNumber" 
+                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0"># Teléfono
+                                  </label>
+                                  <input 
+                                    id='phoneNumber'
+                                    type="text" 
+                                    className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    placeholder="# Teléfono"
+                                    value = {phoneNumber}
+                                    onChange = {e => setPhoneNumber(e.target.value)} 
+                                  />
+                                </div>     
+                                                           
+                                  </>  
+                                )}
+
   
                                   <div>
                                     <label 
