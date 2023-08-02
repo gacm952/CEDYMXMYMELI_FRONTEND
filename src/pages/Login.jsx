@@ -54,10 +54,10 @@ const Login = () => {
 
       setTimeout(() => {
         if (data.role === "Admission") {
-          navigate('/cedym_system')
+          navigate('/MenuAdmission')
         } else {
           if (data.role === "User") {
-            navigate('/Bookings') 
+            navigate('/Menu') 
           }
         }
       }, 1000);      

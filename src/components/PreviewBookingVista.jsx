@@ -171,7 +171,7 @@ const { msg } = alert
                 
                         <div className="flex">
                           <span className="max-w-max">
-                            <Link className=" flex gap-2 text-gray-600 hover:text-black" to={`/cedym_system/editBooking/${_id}`}
+                            <Link className=" flex gap-2 text-gray-600 hover:text-black" to={`/MenuAdmission/ReBooking/${_id}`}
                             >ReAgendar
                             
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

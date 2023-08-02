@@ -217,11 +217,46 @@ const Stepper = () => {
     const haveMotiveMGAd = bookingUserAuth.some(booking => booking.Motive === "Medicina General Primera vez");
     const haveMotiveGAd = bookingUserAuth.some(booking => booking.Motive === "Ginecologia Primera vez");
     
-
     const formattedDateHour = format(dateHour, 'dd/MM/yyyy HH:mm:ss');
 
-    let updatedMotive;
+        // Verificar si el usuario autenticado es un Visitador Médico si es desde Admission
 
+        if (roleAdmission) {
+          if (userData.Type === "Visitador Médico") {
+    
+            // Obtener las citas programadas del Visitador Médico para la fecha seleccionada
+            const VMforDate = bookingUserAuth
+              .filter(booking => booking.Motive === userData.Motive && 
+                      booking.dateHour.includes(selectedDate.toISOString().slice(0, 10)));
+      
+            if (VMforDate.length >= 3) {
+              setAlert({
+                msg: 'Se ha alcanzado el límite de citas permitidas para Visitadores Medicos para esta fecha.',
+                error: true,
+              });
+              return;
+            }
+          }
+        } else {
+          if (userData.Type === "Visitador Médico") {
+    
+            // Obtener las citas programadas del Visitador Médico para la fecha seleccionada
+            const VMforDate = bookingAuth
+              .filter(booking => booking.Motive === userData.Motive && 
+                      booking.dateHour.includes(selectedDate.toISOString().slice(0, 10)));
+      
+            if (VMforDate.length >= 3) {
+              setAlert({
+                msg: 'Se ha alcanzado el límite de citas permitidas para Visitadores Medicos para esta fecha.',
+                error: true,
+              });
+              return;
+            }
+          }
+        }
+    
+
+    let updatedMotive;
 
     if (roleAdmission) {
 
@@ -737,7 +772,7 @@ const Stepper = () => {
              {step <= 1 && (
                
                <button
-               to="/Bookings"
+               to="/Menu"
                className="
                inline-flex
                items-center
@@ -821,7 +856,7 @@ const Stepper = () => {
              {step <= 1 && (
                
                <button
-               to="/Bookings"
+               to="/Menu"
                className="
                inline-flex
                items-center

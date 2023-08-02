@@ -24,7 +24,7 @@ useEffect(() => {
       });
 
       setTimeout(() => {
-        navigate("/Bookings")
+        navigate("/Menu")
       }, 4000);
     }
 

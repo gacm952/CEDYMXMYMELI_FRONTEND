@@ -54,7 +54,7 @@ const ProtectRuteAdmission = () => {
         
         </div>
       ) : (
-        navigate("/")
+        navigate("/Login")
       )}
     </>
   );

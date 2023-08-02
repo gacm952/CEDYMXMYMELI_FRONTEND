@@ -77,9 +77,9 @@ const AuthProvider = ({children}) => {
 
     useEffect(() => {
         if (!loading && auth && isAdmission) {
-          navigate('/cedym_system'); 
+          navigate('/MenuAdmission'); 
         } else if (!loading && auth && isUser) {
-          navigate('/Bookings'); 
+          navigate('/Menu'); 
         }
       }, [loading, auth, isAdmission]);
 

@@ -28,7 +28,7 @@ const Modal4 = ({ isOpen }) => {
                   <Link target="_blank" to="https://api.whatsapp.com/send/?phone=573172309528&text&type=phone_number&app_absent=0" className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-emerald-200 text-emerald-700 rounded-lg font-semibold text-sm md:ml-2 md:order-2"
                   > Contactar </Link>
                
-                  <Link to="/Bookings" className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm mt-4
+                  <Link to="/Menu" className="block w-full md:inline-block md:w-auto px-4 py-3 md:py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold text-sm mt-4
                       md:mt-0 md:order-1">Volver Atrás</Link>
 
                   </div>

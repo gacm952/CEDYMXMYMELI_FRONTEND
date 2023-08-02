@@ -106,7 +106,7 @@ const BookingProvider = ({children}) => {
 
                 setAllBookings((prevBookings) => {
                   return prevBookings.map((prevBooking) => {
-                    if (prevBooking.id === data.id) {
+                    if (prevBooking._id === data._id) {
                       return data;
                     }
                     return prevBooking;
@@ -124,11 +124,11 @@ const BookingProvider = ({children}) => {
               
             setTimeout(() => {
                 if (isAdmission) {
-                    navigate("/cedym_system/vista-admission")
+                    navigate("/MenuAdmission/Today")
                 } 
 
                 if (isUser) {
-                    navigate("/Bookings")
+                    navigate("/Menu")
                 }
             }, 3000 )
 
@@ -163,11 +163,11 @@ const BookingProvider = ({children}) => {
                 setBookings((prevBookings) => [...prevBookings, data])
 
                 if (isAdmission) {
-                    navigate("/cedym_system")
+                    navigate("/MenuAdmission")
                 } 
     
                 if (isUser) {
-                    navigate("/Bookings")
+                    navigate("/Menu")
                 }
                 
             }, 3000 )             

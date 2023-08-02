@@ -8,7 +8,7 @@ const MenuAdmission = () => {
     <section className="w-full min-h-screen flex-grow flex justify-center items-center">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mx-28 place-content-center font-bold text-center text-lg"> 
           <Link 
-          to="vista-admission" 
+          to="Today" 
           className="flex justify-center items-center gap-4 rounded-xl bg-gray-200 shadow-md shadow-gray-600 transition ease-in-out delay-100 hover:-translate-y-1 hover:scale-95  duration-300 p-12 w-full h-full text-center"
           >
               Citas de Hoy
@@ -18,7 +18,7 @@ const MenuAdmission = () => {
           </Link>
 
           <Link
-          to="makeBooking"
+          to="Bookings"
           className="flex justify-center items-center gap-4 rounded-xl bg-gray-200 shadow-md shadow-gray-600 transition ease-in-out delay-100 hover:-translate-y-1 hover:scale-95 duration-300 p-12 w-full h-full text-center"
           >
               Agendamiento <br /> de Citas
@@ -38,7 +38,7 @@ const MenuAdmission = () => {
           </Link>
 
           <Link 
-            to="/cedym_system/rebooking"
+            to="/MenuAdmission/CloseSchedule"
             className='flex justify-center items-center gap-4 rounded-xl bg-gray-200 shadow-md shadow-gray-600 transition ease-in-out delay-100 hover:-translate-y-1 hover:scale-95 duration-300 p-12 w-full h-full text-center'>
             ReAgendamiento <br /> Masivo de Citas 
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

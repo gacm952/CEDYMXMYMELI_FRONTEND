@@ -30,7 +30,7 @@ function App() {
       <AuthProvider>
         <BookingProvider>
           <Routes>
-            <Route path="/" element={<AuthLayout/>}>
+            <Route path="/Login" element={<AuthLayout/>}>
                 <Route index element={<Login/>}/>
                 <Route path="Booking" element={<Booking/>} />
                 <Route path="Register" element={<Register/>} />
@@ -40,23 +40,23 @@ function App() {
                 <Route path="ConfirmAccount/:id" element={<ConfirmAcc/>} />
             </Route>
 
-            <Route path="/Bookings" element={<ProtectRute/>}>  
+            <Route path="/Menu" element={<ProtectRute/>}>  
               <Route index element={<Bookings/>} />
-              <Route path="makeBooking" element={<Appointment/>} />
-              <Route path="editBooking" element={<EditBooking/>} />
-              <Route path="editBooking/:id" element={<EditingBooking/>} />
-              <Route path="cancelBooking" element={<CancelBooking/>} />
+              <Route path="Bookings" element={<Appointment/>} />
+              <Route path="EditBooking" element={<EditBooking/>} />
+              <Route path="EditBooking/:id" element={<EditingBooking/>} />
+              <Route path="CancelBooking" element={<CancelBooking/>} />
             </Route>
 
-            <Route path="/cedym_system" element={<ProtectRuteAdmission/>}>  
+            <Route path="/MenuAdmission" element={<ProtectRuteAdmission/>}>  
               <Route index element={<MenuAdmission/>} />
-              <Route path="vista-admission" element={<Vista/>} />
-              <Route path="register" element={<Register/>} />
-              <Route path="makeBooking" element={<Appointment/>} />
-              <Route path="editBooking" element={<EditBooking/>} />
-              <Route path="editBooking/:id" element={<EditingBooking/>} />
-              <Route path="rebooking" element={<RebookingMassively/>} />
-              <Route path="confirmBooking/:id" element={<ConfirmBooking/>} />
+              <Route path="Today" element={<Vista/>} />
+              <Route path="Register" element={<Register/>} />
+              <Route path="Bookings" element={<Appointment/>} />
+              <Route path="ReBooking" element={<EditBooking/>} />
+              <Route path="ReBooking/:id" element={<EditingBooking/>} />
+              <Route path="CloseSchedule" element={<RebookingMassively/>} />
+              <Route path="ConfirmBooking/:id" element={<ConfirmBooking/>} />
             </Route>
           </Routes>
         </BookingProvider>

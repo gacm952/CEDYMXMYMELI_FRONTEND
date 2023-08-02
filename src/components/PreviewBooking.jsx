@@ -55,7 +55,7 @@ const handleEditBooking = () => {
     }, 5000);
   } else {
     // Redireccionar a la página de edición
-    navigate(`/Bookings/editBooking/${_id}`);
+    navigate(`/Menu/ReBooking/${_id}`);
   }
 };
 
@@ -93,7 +93,7 @@ const handleClick = () => {
 
     setTimeout(() => {
       setAlert({})
-      navigate('/Bookings')
+      navigate('/Menu')
       setIsModalOpen1(false)
     }, 3000)
 

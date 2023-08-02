@@ -103,7 +103,7 @@ const CreatePassword = () => {
       setChangedPassword(true)
 
       setTimeout(() => {
-        navigate("/")
+        navigate("/Login")
       }, 3000);
 
     } catch (error) {
@@ -167,7 +167,7 @@ const CreatePassword = () => {
                 
                   {changedPassword && (
                     <p className="mt-6 text-sm text-grey-600 text-center">
-                    <Link to="/" className="font-medium text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
+                    <Link to="/Login" className="font-medium text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
                     </p>
                   )}
 

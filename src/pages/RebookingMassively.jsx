@@ -127,7 +127,7 @@ const RebookingMassively = () => {
   })
 
   setTimeout(() => {
-    navigate("/cedym_system");
+    navigate("/MenuAdmission");
     setAlert({})
   }, 5000);
 

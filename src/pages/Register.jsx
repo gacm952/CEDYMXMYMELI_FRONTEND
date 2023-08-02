@@ -1239,7 +1239,7 @@ const Register = () => {
                                 </div>
                         <button type="submit" className="w-full font-bold uppercase py-3 bg-emerald-600 text-white hover:bg-emerald-800"> Registrarse </button>
                         <p className="mt-6 text-sm text-grey-600 text-center">¿Ya tienes una cuenta?
-                            <Link to="/" className="font-medium ml-2 text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
+                            <Link to="/Login" className="font-medium ml-2 text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
                         </p>
                     </div>
                   </form>
