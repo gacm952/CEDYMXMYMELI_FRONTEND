@@ -320,9 +320,9 @@ const Stepper = () => {
         subType,
         Motive: updatedMotive,
         bookingTo: foundUserId,
-        bookingToName: foundUserName || auth.name,
-        bookingToLastName: foundUserLastName || auth.lastName,
-        bookingToEmail: foundUserEmail || auth.email,
+        bookingToName: foundUserName || bookingData.bookingToName || auth.name,
+        bookingToLastName: foundUserLastName || bookingData.bookingToLastName || auth.lastName,
+        bookingToEmail: foundUserEmail || bookingData.bookingToEmail || auth.email,
       };
       
       if (id !== null) {
