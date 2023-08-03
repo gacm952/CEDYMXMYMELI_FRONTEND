@@ -5,7 +5,7 @@ import { Navigate } from "react-router-dom"
 
 const Header = () => {
 
-  const {closeSessionAuth} = useAuth()
+  const {closeSessionAuth, auth} = useAuth()
   const {closeSessionBooking} = useBookings()
   const navigate = useNavigate()
 
@@ -32,10 +32,16 @@ const Header = () => {
                 </svg>
             </Link>  
           </div>
+
+          <div className="flex gap-4">
+
+          <p className="flex justify-center items-center text-lg font-semibold">¡Hola, {auth.name} 👋!</p>
           
           <button onClick={handleCloseSession} type="button" className="text-white text-sm bg-emerald-700 p-3 rounded-md uppercase font-bold">
             Cerrar sesión
           </button>
+
+          </div>
 
         </div>
 

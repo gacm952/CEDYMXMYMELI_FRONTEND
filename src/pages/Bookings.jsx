@@ -1,14 +1,72 @@
 import { Link } from "react-router-dom"
 import useBookings from "../hooks/useBookings";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal7 from "../components/Modal7";
+import { startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import Modal9 from "../components/Modal9";
 
 const Bookings = () => {
 
   const { bookings } = useBookings()
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen9, setIsModalOpen9] = useState(false);
+  const [cancelationCount, setCancelationCount] = useState(0);
+  const [cancelationsThisWeek, setCancelationsThisWeek] = useState(0);
 
   const isActive = bookings.some((booking) => booking.Status === "Active");
+
+  const closeModal9 = () => {
+    setIsModalOpen9(false);
+    setCancelationsThisWeek(0);
+    localStorage.setItem("isModalOpen9", false);
+  };
+
+  const countCancelations = (bookings) => {
+    const cancelations = bookings.filter((booking) => booking.Status === "Delete");
+    return cancelations.length;
+  };
+  
+  useEffect(() => {
+      const storedIsModalOpen9 = localStorage.getItem("isModalOpen9");
+    if (storedIsModalOpen9 === "true") {
+      setIsModalOpen9(true);
+    }
+  
+    if (bookings.length > 0) {
+      const totalCancelations = countCancelations(bookings);
+      setCancelationCount(totalCancelations);
+  
+      const today = new Date();
+      const startOfWeekDate = startOfWeek(today, { weekStartsOn: 1 });
+      const endOfWeekDate = endOfWeek(today, { weekStartsOn: 1 });
+  
+      // Filtrar las cancelaciones para la semana actual
+      const cancelationsThisWeek1 = bookings.filter((booking) => {
+        const bookingDate = new Date(booking.dateHour);
+        return (
+          booking.Status === "Delete" &&
+          isWithinInterval(bookingDate, { start: startOfWeekDate, end: endOfWeekDate })
+        );
+      }).length;
+  
+      setCancelationsThisWeek(cancelationsThisWeek1);
+  
+      if (cancelationsThisWeek >= 3) {
+        const isModalOpenInLocalStorage = localStorage.getItem("isModalOpen9");
+        if (isModalOpenInLocalStorage !== "false") {
+          setIsModalOpen9(true);
+        }
+      }
+    }
+  }, [bookings]);
+
+  useEffect(() => {
+    const isModalOpenInLocalStorage = localStorage.getItem("isModalOpen9");
+    if (isModalOpenInLocalStorage !== "false") {
+      setIsModalOpen9(true);
+      localStorage.setItem("isModalOpen9", "true"); // Actualizamos el valor en localStorage al montar el componente
+    }
+  }, []);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -80,6 +138,7 @@ const Bookings = () => {
       <div className=" grid grid-cols-1 gap-12 lg:grid-cols-2 mx-auto place-items-center font-bold text-center text-lg">   
 
       <Modal7 isOpen={isModalOpen} onClose={closeModal} />
+      <Modal9 isOpen={isModalOpen9} onClose={closeModal9} />
 
         {isActive ? (
           <>

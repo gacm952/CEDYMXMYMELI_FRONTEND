@@ -40,6 +40,8 @@ const ForgotPassword = () => {
       setEmailSent(true)
 
     } catch (error) {
+      setIsModalOpen(false)
+
       setAlert({
         msg: error.response.data.msg,
         error: true

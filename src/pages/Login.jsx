@@ -63,10 +63,14 @@ const Login = () => {
       }, 1000);      
 
     } catch (error) {
+
+      setIsModalOpen(false)
+
       setAlert({
         msg: error.response.data.msg,
         error: true
       })
+      
     }
 
   }

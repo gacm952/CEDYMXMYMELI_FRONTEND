@@ -35,7 +35,13 @@ const BookingProvider = ({children}) => {
 
             const { data } = await costumerAxios('/createbooking', config)
             
-            setBookings((prevBookings) => [...prevBookings, ...data])
+            setBookings((prevBookings) => {
+                const filteredData = data.filter((newBooking) => {
+                  return !prevBookings.some((prevBooking) => prevBooking._id === newBooking._id);
+                });
+              
+                return [...prevBookings, ...filteredData];
+              });
 
             } catch (error) {
                 

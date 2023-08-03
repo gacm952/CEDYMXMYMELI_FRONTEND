@@ -43,7 +43,7 @@ const handleEditBooking = () => {
 
   const differenceInDays = calculateDifferenceInDays(dateHour);
 
-  if (differenceInDays < 2) {
+  if (differenceInDays < 1) {
     // Mostrar alerta
     setAlert({
       msg: "No puedes editar la cita un día antes de la fecha prevista",
@@ -63,7 +63,7 @@ const handleClick = () => {
 
   const differenceInDays = calculateDifferenceInDays(dateHour);
 
-  if (differenceInDays < 2) {
+  if (differenceInDays < 1) {
 
     setIsModalOpen(false);
 
@@ -101,6 +101,8 @@ const handleClick = () => {
     setIsModalOpen(false);
     
   } catch (error) {
+    setIsModalOpen1(false)
+    setIsModalOpen(false);
     console.log(error)
   }
     

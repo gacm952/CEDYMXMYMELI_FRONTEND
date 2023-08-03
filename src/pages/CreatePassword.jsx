@@ -107,6 +107,8 @@ const CreatePassword = () => {
       }, 3000);
 
     } catch (error) {
+      setIsModalOpen(false)
+
       setAlert({
         msg: error.response.data.msg,
         error: true

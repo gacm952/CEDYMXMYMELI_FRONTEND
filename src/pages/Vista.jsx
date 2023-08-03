@@ -46,11 +46,11 @@ const dateAction = selectedDate ? format(new Date(selectedDate), 'dd-MM-yyyy') :
 const handleDateChange = (newValue) => {
   setSelectedDate(newValue);
 
-  localStorage.setItem('selectedDate', JSON.stringify(newValue));
+  sessionStorage.setItem('selectedDate', JSON.stringify(newValue));
 };
 
 useEffect(() => {
-  const storedDate = localStorage.getItem('selectedDate');
+  const storedDate = sessionStorage.getItem('selectedDate');
 
   if (storedDate) {
     setSelectedDate(new Date(JSON.parse(storedDate)));
@@ -126,17 +126,24 @@ const filteredBookings = useMemo(() => {
   return allBookings.filter((booking) => {
     const bookingDate = booking.dateHour.slice(0, 10);
     const bookingType = booking.Type.toLowerCase();
+    const bookingSubType = booking.subType?.toLowerCase();
     const bookingMotive = booking.Motive.toLowerCase();
-    const bookingUser = allUsers.find(user => user._id === booking.bookingFor);
+    const bookingUser = allUsers.find(user => user._id === booking.bookingTo);
     const userName = bookingUser ? bookingUser.name.toLowerCase() : '';
     const userLastName = bookingUser ? bookingUser.lastName.toLowerCase() : '';
+    const userDocument = bookingUser?.document?.toString() || '';
 
     return (
+      booking.Status !== 'Delete' &&
       (!selectedDate || bookingDate === formattedSelectedDate) &&
-      (searchTerm === '' || bookingMotive.includes(searchTerm.toLowerCase()) 
+      (searchTerm === '' 
+      || bookingMotive.includes(searchTerm.toLowerCase()) 
       || bookingType.includes(searchTerm.toLowerCase()) 
       || userName.includes(searchTerm.toLowerCase())
-      || userLastName.includes(searchTerm.toLowerCase()))
+      || userLastName.includes(searchTerm.toLowerCase())
+      || (bookingSubType && bookingSubType.includes(searchTerm.toLowerCase()))
+      || (userDocument && userDocument.includes(searchTerm))
+      )
     );
   });
 }, [loading, allBookings, allUsers, selectedDate, formattedSelectedDate, searchTerm]);
@@ -278,7 +285,7 @@ const filteredBookings = useMemo(() => {
               </div>
 
             <div>
-                    {filteredBookings.length ? (
+            {filteredBookings.filter((booking) => booking.Status === "Active").length ?  (
             <div className=''>
               {filteredBookings
                 .sort((a, b) => a.dateHour.localeCompare(b.dateHour))
@@ -293,11 +300,11 @@ const filteredBookings = useMemo(() => {
             </div>
             </div>
 
-            <div className="mt-32">
+            <div className="mt-32 mb-24">
               <h2 className="text-2xl font-bold text-left text-gray-800 lg:text-2xl mb-8">
                   Pacientes que Asistieron
               </h2> 
-                        {filteredBookings.length ? (
+              {filteredBookings.filter((booking) => booking.Status === "Inactive").length ? (
                 <div className=''>
                   {filteredBookings
                     .sort((a, b) => a.dateHour.localeCompare(b.dateHour))
@@ -307,7 +314,7 @@ const filteredBookings = useMemo(() => {
                   ))}
                 </div>
               ) : (
-                <p>No hay citas aún</p>
+                <p>No Hay Citas Asistidas Aún</p>
               )}
             </div>
     

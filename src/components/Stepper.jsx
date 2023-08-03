@@ -340,6 +340,8 @@ const Stepper = () => {
       setIsButtonDisabled(true);
       
     } catch (error) {
+      setIsModalOpen2(false)
+
       console.log(error)
     }
     };

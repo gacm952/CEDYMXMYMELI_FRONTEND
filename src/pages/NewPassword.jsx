@@ -115,6 +115,8 @@ const NewPassword = () => {
       setChangedPassword(true)
 
     } catch (error) {
+      setIsModalOpen(false)
+
       setAlert({
         msg: error.response.data.msg,
         error: true
