@@ -367,7 +367,7 @@ const Register = () => {
     <>
 
     {roleAdmission && (
-        <section className='w-full min-h-screen flex-grow flex justify-center items-center'>
+        <section className='w-full min-h-screen my-32 flex-grow flex justify-center items-center'>
 
         <Modal8 isOpen={isModalOpen} onClose={closeModal} />
 
@@ -1246,8 +1246,8 @@ const Register = () => {
                 )}             
 
                 {isRegistered && (            
-                  <div className='shadow-md text-lg text-white bg-emerald-700 shadow-gray-600 border-2 border-emerald-600 rounded-3xl p-4 text-center font-extrabold font-poppins mb-12'>
-                  <h2 className='text-2xl mb-4'>Correo enviado</h2>
+                  <div className='text-justify p-4 font-poppins mb-12'>
+                  <h2 className='text-xl mb-4'>Correo enviado</h2>
                   <p>Por favor revisa tu bandeja de entrada al {emailMask} y sigue los pasos indicados para confirmar tu cuenta.</p> 
                   </div>
                 )} 

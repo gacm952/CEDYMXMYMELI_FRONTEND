@@ -35,27 +35,27 @@ const ProtectRuteAdmission = () => {
 
   return (
     <>
-      {auth.role === "Admission" ? (
-        <div className="w-full sm:block min-w-600">
+    {auth.role === "Admission" ? (
+      <div className="w-full sm:block min-w-600">
 
-          {isMobile && mobileMessage}
+        {isMobile && mobileMessage}
 
-            <div className="hidden sm:flex">
-            <Header />
-          </div>
-          <main className="hidden sm:block">
-          
-            <Outlet />
-          </main>
-          <div className="hidden sm:flex">
-            <Footer />
-          </div>
-      
-        
+          <div className="hidden sm:block fixed top-0 left-0 w-full z-50">
+          <Header />
         </div>
-      ) : (
-        navigate("/")
-      )}
+        <main className="hidden sm:block">
+        
+          <Outlet />
+        </main>
+        <div className="hidden sm:block fixed bottom-0 left-0 w-full z-50">
+          <Footer />
+        </div>
+    
+      
+      </div>
+    ) : (
+      navigate("/Login")
+    )}
     </>
   );
 };

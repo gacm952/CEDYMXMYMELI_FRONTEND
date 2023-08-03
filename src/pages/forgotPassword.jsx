@@ -102,8 +102,8 @@ const ForgotPassword = () => {
               )}
 
               {emailSent && (
-                <p className='text-2xl shadow-md text-white bg-emerald-700 shadow-gray-600 border-2 border-emerald-600 rounded-3xl p-4 text-center font-extrabold font-poppins mb-12'>Correo enviado, por favor revisa tu bandeja de entrada y sigue los pasos indicados.</p>
-              )}
+                <p className='text-xl text-justify p-4 font-poppins mb-12'>Correo enviado, por favor revisa tu bandeja de entrada y sigue los pasos indicados.</p>
+                )}
               
             </div>
           </div>
