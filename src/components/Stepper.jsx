@@ -411,7 +411,7 @@ const Stepper = () => {
                                         onChange={e => setTypeDocument(e.target.value)}
           
                                       >🡣
-                                        <option value="" hidden >🡣</option>
+                                        <option value="" hidden >▼</option>
                                         <option value="CC">CC</option>
                                         <option value="TI">TI</option>
                                         <option value="RUT">RUT</option>

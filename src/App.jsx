@@ -30,7 +30,7 @@ function App() {
       <AuthProvider>
         <BookingProvider>
           <Routes>
-            <Route path="/Login" element={<AuthLayout/>}>
+            <Route path="/" element={<AuthLayout/>}>
                 <Route index element={<Login/>}/>
                 <Route path="Booking" element={<Booking/>} />
                 <Route path="Register" element={<Register/>} />

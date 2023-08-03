@@ -91,7 +91,7 @@ const ForgotPassword = () => {
                   <nav className="lg:flex lg:justify-between mt-12" >
                           <div className='flex justify-center flex-col text-center mb-2'>
                     <p className="lg:mt-8 text-sm text-grey-600 text-center">¿Ya tienes una cuenta?</p>
-                    <Link to="/Login" className="font-medium text-sm text-emerald-600 hover:text-emerald-500">Inicia sesión</Link>
+                    <Link to="/" className="font-medium text-sm text-emerald-600 hover:text-emerald-500">Inicia sesión</Link>
                           </div>
                           <div className='flex justify-center flex-col text-center mb-2'>
                     <p className="lg:mt-8 text-sm text-grey-600 text-center">¿No tienes una cuenta?</p>

@@ -14,7 +14,7 @@ const Header = () => {
     //closeSessionBooking()
     localStorage.removeItem('token')
     setTimeout(() => {
-      navigate("/Login")
+      navigate("/")
     }, 2000);
   }
 

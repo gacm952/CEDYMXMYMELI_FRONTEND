@@ -16,7 +16,7 @@ const ProtectRute = () => {
   return (
     <>
       {auth?.role === "User" && <Outlet />}
-      {!auth && navigate('/Login')}
+      {!auth && navigate('/')}
     </>
   );
 };

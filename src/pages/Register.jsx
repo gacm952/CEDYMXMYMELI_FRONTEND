@@ -139,6 +139,17 @@ const Register = () => {
           })
           return 
         }
+
+        if(typeDocument === "TI") {
+          if ([typeDocument3, document1, name1, 
+            lastName1].includes('')) {
+                setAlert({
+                  msg: 'todos los campos son obligatorios',
+                  error: true,
+                })
+                return 
+              }
+        }
       }
 
       if(document.length < 4) {
@@ -212,17 +223,6 @@ const Register = () => {
           error: true,
         });
         return;
-      }
-
-      if(typeDocument === "TI") {
-        if ([typeDocument3, document1, name1, 
-          lastName1].includes('')) {
-              setAlert({
-                msg: 'todos los campos son obligatorios',
-                error: true,
-              })
-              return 
-            }
       }
 
       const lowerCaseEmail = email ? toLowerCaseEmail(email) : "";
@@ -386,8 +386,8 @@ const Register = () => {
                                   value={typeDocument2}
                                   onChange={e => setTypeDocument2(e.target.value)}
     
-                                >🡣
-                                  <option value="" hidden >🡣</option>
+                                >▼
+                                  <option value="" hidden >▼</option>
                                   <option value="CC">CC</option>
                                   <option value="TI">TI</option>
                                   <option value="RUT">RUT</option>
@@ -454,7 +454,7 @@ const Register = () => {
                                       setTypeDocument(e.target.value);
                                     }}      
                                   >
-                                    <option value="" hidden>Tipo de Documento</option>
+                                    <option value="" hidden>Tipo de Documento ▼</option>
                                     <option value="CC">Cédula de Ciudadanía</option>
                                     <option value="TI">Tarjeta de Identidad</option>
                                     <option value="RUT">Registro Único Tributario</option>
@@ -620,7 +620,7 @@ const Register = () => {
                                   value={civilStatus}
                                   onChange={e => setCivilStatus(e.target.value)}
                                 >
-                                    <option value="" hidden>Estado Civil</option>
+                                    <option value="" hidden>Estado Civil ▼</option>
                                     <option value="Soltero/a">Soltero/a</option>
                                     <option value="Casado/a">Casado/a</option>
                                     <option value="Divorciado/a">Divorciado/a</option>
@@ -641,7 +641,7 @@ const Register = () => {
                                   value={typeOfBlood}
                                   onChange={e => setTypeOfBlood(e.target.value)}
                                 >
-                                  <option value="" hidden>Tipo de Sangre</option>
+                                  <option value="" hidden>Tipo de Sangre ▼</option>
                                   <option value="A">A</option>
                                   <option value="A+">A+</option>
                                   <option value="A-">A-</option>
@@ -683,7 +683,7 @@ const Register = () => {
                                       setTypeDocument3(e.target.value);
                                     }}      
                                   >
-                                    <option value="" hidden>Tipo de Documento</option>
+                                    <option value="" hidden>Tipo de Documento ▼</option>
                                     <option value="CC">Cédula de Ciudadanía</option>
                                     <option value="TI">Tarjeta de Identidad</option>
                                     <option value="RUT">Registro Único Tributario</option>
@@ -846,7 +846,7 @@ const Register = () => {
                                     onChange={e => setTypeDocument(e.target.value)}
       
                                   >
-                                      <option value="" hidden>Tipo de Documento</option>
+                                      <option value="" hidden>Tipo de Documento ▼</option>
                                     <option value="CC">Cédula de Ciudadanía</option>
                                     <option value="TI">Tarjeta de Identidad</option>
                                     <option value="RUT">Registro Único Tributario</option>
@@ -1014,7 +1014,7 @@ const Register = () => {
                                     value={civilStatus}
                                     onChange={e => setCivilStatus(e.target.value)}
                                   >
-                                      <option value="" hidden>Estado Civil</option>
+                                      <option value="" hidden>Estado Civil ▼</option>
                                       <option value="Soltero/a">Soltero/a</option>
                                       <option value="Casado/a">Casado/a</option>
                                       <option value="Divorciado/a">Divorciado/a</option>
@@ -1035,7 +1035,7 @@ const Register = () => {
                                     value={typeOfBlood}
                                     onChange={e => setTypeOfBlood(e.target.value)}
                                   >
-                                    <option value="" hidden>Tipo de Sangre</option>
+                                    <option value="" hidden>Tipo de Sangre ▼</option>
                                     <option value="A">A</option>
                                     <option value="A+">A+</option>
                                     <option value="A-">A-</option>
@@ -1076,7 +1076,7 @@ const Register = () => {
                                       setTypeDocument3(e.target.value);
                                     }}      
                                   >
-                                    <option value="" hidden>Tipo de Documento</option>
+                                    <option value="" hidden>Tipo de Documento ▼</option>
                                     <option value="CC">Cédula de Ciudadanía</option>
                                     <option value="TI">Tarjeta de Identidad</option>
                                     <option value="RUT">Registro Único Tributario</option>
@@ -1239,7 +1239,7 @@ const Register = () => {
                                 </div>
                         <button type="submit" className="w-full font-bold uppercase py-3 bg-emerald-600 text-white hover:bg-emerald-800"> Registrarse </button>
                         <p className="mt-6 text-sm text-grey-600 text-center">¿Ya tienes una cuenta?
-                            <Link to="/Login" className="font-medium ml-2 text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
+                            <Link to="/" className="font-medium ml-2 text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link>
                         </p>
                     </div>
                   </form>

@@ -285,7 +285,7 @@ const Booking = () => {
                       
                     <nav className="lg:flex lg:justify-between" >
                           <p className="mt-6 text-sm text-grey-600 text-center">¿Ya tienes una cuenta?
-                                <Link to="/Login" className="font-medium text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link></p>
+                                <Link to="/" className="font-medium text-emerald-600 hover:text-emerald-500 ">Inicia sesión</Link></p>
 
                           <p className="mt-6 text-sm text-grey-600 text-center">¿No tienes una cuenta?
                             <Link to="/Register" className="font-medium text-emerald-600 hover:text-emerald-500 ml-2">Regístrate </Link></p>
