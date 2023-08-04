@@ -10,7 +10,7 @@ const Header = () => {
   const navigate = useNavigate()
 
   const handleCloseSession = () => {
-    //closeSessionAuth()
+    closeSessionAuth()
     //closeSessionBooking()
     localStorage.removeItem('token')
     setTimeout(() => {
