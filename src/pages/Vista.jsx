@@ -150,7 +150,7 @@ const filteredBookings = useMemo(() => {
 
     return (
       <>  
-      <div className="min-w-7xl mt-32 min-h-screen mx-8 text-xl sm:text-sm">
+      <div className="min-w-7xl my-32 min-h-screen mx-8 text-xl sm:text-sm">
 
           <div className="hidden justify-between pt-4 px-4">
                   <Link to="/MenuAdmission">

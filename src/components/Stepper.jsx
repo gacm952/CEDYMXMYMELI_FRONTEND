@@ -314,7 +314,7 @@ const Stepper = () => {
 
       setIsModalOpen2(true)
 
-      const bookingData = {
+      const bookingData1 = {
         dateHour,
         Type,
         subType,
@@ -326,12 +326,11 @@ const Stepper = () => {
       };
       
       if (id !== null) {
-        bookingData.id = id;
+        bookingData1.id = id;
       }
       
-
-      submitBooking(bookingData, {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
-
+      submitBooking(bookingData1, {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
+      
       setAlert({
       msg: 'Cita agendada correctamente, ¡te esperamos!',
       error: false,
