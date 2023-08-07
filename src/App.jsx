@@ -20,6 +20,8 @@ import MenuAdmission from "./pages/MenuAdmission.jsx";
 import RebookingMassively from "./pages/RebookingMassively.jsx";
 import CreatePassword from "./pages/CreatePassword.jsx"; 
 import ConfirmBooking from "./pages/ConfirmBooking.jsx";
+import CustomPlans from "./pages/CustomPlans.jsx";
+import CustomPlansSubscription from "./pages/CustomPlansSubscription.jsx";
 
 import { AuthProvider } from './context/AuthProvider.jsx'
 import { BookingProvider } from './context/BookingProvider.jsx'
@@ -57,6 +59,8 @@ function App() {
               <Route path="ReBooking/:id" element={<EditingBooking/>} />
               <Route path="CloseSchedule" element={<RebookingMassively/>} />
               <Route path="ConfirmBooking/:id" element={<ConfirmBooking/>} />
+              <Route path="CustomPlans" element={<CustomPlans/>} />
+              <Route path="PlanSubscription" element={<CustomPlansSubscription/>} />
             </Route>
           </Routes>
         </BookingProvider>

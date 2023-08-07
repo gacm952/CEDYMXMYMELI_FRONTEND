@@ -55,7 +55,7 @@ const handleEditBooking = () => {
     }, 5000);
   } else {
     // Redireccionar a la página de edición
-    navigate(`/Menu/ReBooking/${_id}`);
+    navigate(`/Menu/EditBooking/${_id}`);
   }
 };
 

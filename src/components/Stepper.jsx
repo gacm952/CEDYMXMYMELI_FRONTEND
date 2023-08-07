@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import Calendar from "../components/Calendar"
 import useAuth from '../hooks/useAuth';
 import useBookings from '../hooks/useBookings';
@@ -37,6 +37,14 @@ const Stepper = () => {
   const [foundUserName, setFoundUserName] = useState('');
   const [foundUserLastName, setFoundUserLastName] = useState('');
   const [foundUserEmail, setFoundUserEmail] = useState('');
+  const location = useLocation();
+  const { from } = location.state || {};
+  const [foundUser, setFoundUser] = useState(null);
+  const [planCost, setPlantCost] = useState(0);
+  const [planCost2, setPlantCost2] = useState(0);
+  const [sections, setSections] = useState([{ id: 1 }]); // Initial section
+
+  console.log(sections, planCost)
 
   const formattedTime = selectedTime ? format(selectedTime, 'h:mm a') : null;
 
@@ -94,9 +102,17 @@ const Stepper = () => {
     }
   }, [userData.Type]);
 
+  
+  const addSection = () => {
+    const newSectionId = sections.length + 1;
+    setSections([...sections, { id: newSectionId }]);
+  };
+
   const handleNextStep = () => {
     
     // Validar campos antes de pasar al siguiente paso
+
+    if (from !== '/MenuAdmission/CustomPlans') {
 
     if (step === 1 && (!userData.Type || !userData.Motive || (userData.Type === "EPS" && !userData.subType))) {
       setAlert({
@@ -113,6 +129,52 @@ const Stepper = () => {
       });
       return
     }
+
+  }
+
+  if (step === 2 && from === '/MenuAdmission/CustomPlans') {
+
+    const isNumberValid = /^\d+$/.test(planCost);
+
+    const isNumber2Valid = /^\d+$/.test(planCost2);
+
+    if (!isNumberValid || !isNumber2Valid) {
+      setAlert({
+        msg: 'El monto debe contener solo números.',
+        error: true,
+      });
+      return;
+    }
+
+    // Validación para el monto mínimo
+    const totalPlantCost = sections.reduce((total, section) => total + parseFloat(section.planCost || 0), 0);
+    
+    if (totalPlantCost < 3500000) {
+      setAlert({
+        msg: 'El monto debe llegar al mínimo permitido.',
+        error: true,
+      });
+      return;
+    }
+
+    // Validación de campos obligatorios en todas las secciones
+    if (step === 2 && sections.some(section => !section.Motive)) {
+      setAlert({
+        msg: 'Completa todos los campos obligatorios antes de continuar.',
+        error: true
+      });
+      return;
+    }
+
+    if (step === 3 && (!selectedDate || !selectedTime)) {
+      setAlert({
+        msg: 'Completa todos los campos obligatorios antes de continuar.',
+        error: true
+      });
+      return
+    }
+
+  }
 
     // Pasar al siguiente paso
 
@@ -180,7 +242,6 @@ const Stepper = () => {
     1: "Selecciona una Fecha Disponible.",
     2: "Verifica tus Datos."
   };
-
 
   const {Type, subType, Motive} = userData
   const dateHour = `${selectedDate}, ${selectedTime}`
@@ -320,9 +381,9 @@ const Stepper = () => {
         subType,
         Motive: updatedMotive,
         bookingTo: foundUserId,
-        bookingToName: foundUserName || bookingData.bookingToName || auth.name,
-        bookingToLastName: foundUserLastName || bookingData.bookingToLastName || auth.lastName,
-        bookingToEmail: foundUserEmail || bookingData.bookingToEmail || auth.email,
+        bookingToName: foundUserName || bookingData?.bookingToName || auth.name,
+        bookingToLastName: foundUserLastName || bookingData?.bookingToLastName || auth.lastName,
+        bookingToEmail: foundUserEmail || bookingData?.bookingToEmail || auth.email,
       };
       
       if (id !== null) {
@@ -353,7 +414,7 @@ const Stepper = () => {
 
     const documentTypeVerification = allUsers.some((user) => user.typeDocument === typeDocument)
 
-    const userFoundNames =  `Nombre: ${found.name} ${found.secondName} ${found.lastName} ${found.secondLastName} ${found.typeDocument}: ${found.document}`
+    const userFoundNames =  `${found.name} ${found.secondName} ${found.lastName} ${found.secondLastName} ${found.typeDocument}: ${found.document}`
     
       if (found && documentTypeVerification) {
         
@@ -361,6 +422,7 @@ const Stepper = () => {
         setFoundUserName(found.name)
         setFoundUserLastName(found.lastName)
         setFoundUserEmail(found.email)
+        setFoundUser(found)
         setSearchEmail(userFoundNames);
 
         setAlert2({
@@ -391,85 +453,10 @@ const Stepper = () => {
       }
     };
 
-  const renderStepContent = () => {
-
-    if ((roleUser && !params.id) || roleAdmission) {
-    switch (step) {
-      case 1:
-        return (
-          <div>
-            <form className='max-w-screen-md mx-auto'>
-
-              {(!roleUser && !params.id) && (  <div className='flex flex-col my-4'>
-                    <div className='flex gap-2'>
-                      <div className='flex-[1%] mt-8'>
-                                      <select
-                                        id="emailV"
-                                        className="text-center font-bold shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        value={typeDocument}
-                                        onChange={e => setTypeDocument(e.target.value)}
-          
-                                      >🡣
-                                        <option value="" hidden >▼</option>
-                                        <option value="CC">CC</option>
-                                        <option value="TI">TI</option>
-                                        <option value="RUT">RUT</option>
-                                        <option value="CE">CE</option>
-                                        <option value="RCN">RCN</option>
-                                        <option value="NIT">NIT</option>
-                                        <option value="PEP">PEP</option>
-                                        <option value="PPT">PPT</option>
-                                        <option value="P">P</option>
-                                        <option value="LM">LM</option>
-                                        <option value="ESI">EX</option>
-
-                                      </select>
-                      </div>
-
-                      <div className='flex-[80%] flex-col'>
-                
-                        <label
-                            className="inline-flex mb-2 text-sm text-gray-800"
-                            htmlFor='' 
-                          >Ingresa el Documento del Paciente </label>
-                      
-                        <input 
-                        type="search"   
-                        placeholder='Buscar Documento'
-                        className='w-full
-                                px-3
-                                py-2
-                                text-gray-800
-                                border
-                                rounded
-                                outline-none
-                                bg-gray-50
-                                focus:ring
-                                ring-emerald-500
-                                mb-4
-                                ' 
-                          value={searchEmail}
-                          onChange={e => setSearchEmail(e.target.value)}>
-                        </input>
-                      </div>
-                    </div>
-
-                     <div className='flex justify-end'>
-                    <button className='  
-                    px-12
-                    py-2
-                    text-sm text-white
-                  bg-emerald-700
-                    rounded-lg
-                    outline-none
-                  hover:bg-emerald-800
-                  ring-indigo-300' 
-                  onClick={handleSearch}>Buscar</button>
-                  </div>
-                  <Modal3 isOpen={isModalOpen} onClose={closeModal} />
-                </div> )}
-                    
-               <div className="flex flex-col my-4">
+  const StepOneNewBooking = () => {
+    return (
+      <>
+        <div className="flex flex-col my-4">
                   <label
                     className="inline-flex mb-2 text-sm text-gray-800"
                     htmlFor='type' 
@@ -586,9 +573,9 @@ const Stepper = () => {
                 </div>
               )}
 
-                </div>
+        </div>
 
-                <div className="flex flex-col">
+        <div className="flex flex-col">
                     <label className="inline-flex mb-2 text-sm text-gray-800">
                         Selecciona el Tipo de Cita
                     </label>
@@ -661,7 +648,159 @@ const Stepper = () => {
                     </select>
                     )}
                     
-                </div>
+        </div>
+      </>
+    )
+  };
+
+  const StepOneNewSubscription = () => {
+    return (
+      <>
+ 
+     {/* User Data */}
+
+     {foundUser && (
+      <div className=''>
+        <div class="flex max-w-5xl py-6 px-4 mx-4 sm:max-w-lg md:max-w-lg lg:max-w-lg xl:max-w-lg sm:mx-auto md:mx-auto lg:mx-auto xl:mx-auto my-16 bg-white shadow-xl rounded-lg text-gray-900">
+          <div class="rounded-t-lg ml-6 flex items-center justify-center overflow-hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-24 h-24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <div className='w-full flex justify-center items-center flex-col'>
+          <div class="text-justify mt-2">
+              <p class="text-gray-500">
+                <span class="font-semibold">Email:</span> {foundUser.email}
+              </p>
+              <h2 class="text-gray-500">
+                <span class="font-semibold">Nombre:</span> {foundUser.name} {foundUser.secondName} {foundUser.lastName} {foundUser.secondLastName}
+              </h2>
+              <p class="text-gray-500">
+                <span class="font-semibold">Dirección:</span> {foundUser.address}
+              </p>
+              <p class="text-gray-500">
+                <span class="font-semibold">Estado Civil:</span> {foundUser.civilStatus}
+              </p>
+              <p class="text-gray-500">
+                <span class="font-semibold">Documento:</span> {foundUser.typeDocument} {foundUser.document}
+              </p>
+              <p class="text-gray-500">
+                <span class="font-semibold">Tipo de Sangre:</span> {foundUser.typeOfBlood}
+              </p>
+              <p class="text-gray-500">
+                <span class="font-semibold">Número Telefónico:</span> {foundUser.phoneNumber}
+              </p>
+              <p class="text-gray-500">
+                <span class="font-semibold">Fecha de Nacimiento:</span> {format(new Date(foundUser.dateOfBirth), "dd/MM/yyyy")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+     )}
+
+      </>
+    )
+  };
+
+  const renderStepContent = () => {
+
+    if ((roleUser && !params.id) || (roleAdmission && from !== '/MenuAdmission/CustomPlans')) {
+    switch (step) {
+      case 1:
+        return (
+          <div>
+            <form className='max-w-screen-md mx-auto'>
+
+              {/* Info Verification */}
+
+              {(!roleUser && !params.id) && (  
+                <div className='flex flex-col my-4'>
+                    <div className='flex gap-2'>
+                      <div className='flex-[1%] mt-8'>
+                                      <select
+                                        id="emailV"
+                                        className="text-center font-bold shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value={typeDocument}
+                                        onChange={e => setTypeDocument(e.target.value)}
+          
+                                      >🡣
+                                        <option value="" hidden >▼</option>
+                                        <option value="CC">CC</option>
+                                        <option value="TI">TI</option>
+                                        <option value="RUT">RUT</option>
+                                        <option value="CE">CE</option>
+                                        <option value="RCN">RCN</option>
+                                        <option value="NIT">NIT</option>
+                                        <option value="PEP">PEP</option>
+                                        <option value="PPT">PPT</option>
+                                        <option value="P">P</option>
+                                        <option value="LM">LM</option>
+                                        <option value="ESI">EX</option>
+
+                                      </select>
+                      </div>
+
+                      <div className='flex-[80%] flex-col'>
+                
+                        <label
+                            className="inline-flex mb-2 text-sm text-gray-800"
+                            htmlFor='' 
+                          >Ingresa el Documento del Paciente </label>
+                      
+                        <input 
+                        type="search"   
+                        placeholder='Buscar Documento'
+                        className='w-full
+                                px-3
+                                py-2
+                                text-gray-800
+                                border
+                                rounded
+                                outline-none
+                                bg-gray-50
+                                focus:ring
+                                ring-emerald-500
+                                mb-4
+                                ' 
+                          value={searchEmail}
+                          onChange={e => setSearchEmail(e.target.value)}>
+                        </input>
+                      </div>
+                    </div>
+
+                     <div className='flex justify-end'>
+                    <button className='  
+                    px-12
+                    py-2
+                    text-sm text-white
+                  bg-emerald-700
+                    rounded-lg
+                    outline-none
+                  hover:bg-emerald-800
+                  ring-indigo-300' 
+                  onClick={handleSearch}>Buscar</button>
+                  </div>
+                  <Modal3 isOpen={isModalOpen} onClose={closeModal} />
+                </div> 
+              )}
+
+              {/* Normal Booking */}
+
+                {from !== '/MenuAdmission/CustomPlans' && (
+                  <form>
+                    <StepOneNewBooking/>
+                  </form>
+                )}
+
+              {/* Subscription Plan Booking */}
+
+              {from === '/MenuAdmission/CustomPlans' && (
+                  <form>
+                    <StepOneNewSubscription/>
+                  </form>
+                )}
+                  
             </form>
           </div>
         );
@@ -690,7 +829,7 @@ const Stepper = () => {
       default:
         return null;
     }
-  } else {
+  } else if (roleUser && params.id) {
      switch (step) {
       case 1:
         return (
@@ -712,6 +851,384 @@ const Stepper = () => {
             <p>Motivo: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
             <p>Fecha Seleccionada: <span className='font-semibold'>{selectedDate?.toLocaleDateString()}</span> </p>
             <p>Hora Seleccionada: <span className='font-semibold'>{formattedTime}</span> </p>
+          </div>
+        );
+      default:
+        return null;
+    }
+  } else if (from === '/MenuAdmission/CustomPlans') {
+    switch (step) {
+      case 1:
+        return (
+          <div>
+            <form className='max-w-screen-md mx-auto'>
+
+              {/* Info Verification */}
+
+              {(!roleUser && !params.id) && (  
+                <div className='flex flex-col my-4'>
+                    <div className='flex gap-2'>
+                      <div className='flex-[1%] mt-8'>
+                                      <select
+                                        id="emailV"
+                                        className="text-center font-bold shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value={typeDocument}
+                                        onChange={e => setTypeDocument(e.target.value)}
+          
+                                      >🡣
+                                        <option value="" hidden >▼</option>
+                                        <option value="CC">CC</option>
+                                        <option value="TI">TI</option>
+                                        <option value="RUT">RUT</option>
+                                        <option value="CE">CE</option>
+                                        <option value="RCN">RCN</option>
+                                        <option value="NIT">NIT</option>
+                                        <option value="PEP">PEP</option>
+                                        <option value="PPT">PPT</option>
+                                        <option value="P">P</option>
+                                        <option value="LM">LM</option>
+                                        <option value="ESI">EX</option>
+
+                                      </select>
+                      </div>
+
+                      <div className='flex-[80%] flex-col'>
+                
+                        <label
+                            className="inline-flex mb-2 text-sm text-gray-800"
+                            htmlFor='' 
+                          >Ingresa el Documento del Paciente </label>
+                      
+                        <input 
+                        type="search"   
+                        placeholder='Buscar Documento'
+                        className='w-full
+                                px-3
+                                py-2
+                                text-gray-800
+                                border
+                                rounded
+                                outline-none
+                                bg-gray-50
+                                focus:ring
+                                ring-emerald-500
+                                mb-4
+                                ' 
+                          value={searchEmail}
+                          onChange={e => setSearchEmail(e.target.value)}>
+                        </input>
+                      </div>
+                    </div>
+
+                     <div className='flex justify-end'>
+                    <button className='  
+                    px-12
+                    py-2
+                    text-sm text-white
+                  bg-emerald-700
+                    rounded-lg
+                    outline-none
+                  hover:bg-emerald-800
+                  ring-indigo-300' 
+                  onClick={handleSearch}>Buscar</button>
+                  </div>
+                  <Modal3 isOpen={isModalOpen} onClose={closeModal} />
+                </div> 
+              )}
+
+              {/* Subscription Plan Booking */}
+
+              <StepOneNewSubscription/>
+              
+            </form>
+          </div>
+        );
+      case 2:
+        return (
+          <>
+            <div className='grid-cols-2 gap-8 my-4'>
+                    
+                    {/* Plans to choose */}
+
+                    <div className="flex flex-col mb-4">
+                              <label
+                                className="inline-flex mb-2 text-sm text-gray-800"
+                                htmlFor='type' 
+                              >Planes a Elegir</label
+                              >
+                              <select
+                                id='type'
+                                className="
+                                  w-full
+                                  px-3
+                                  py-2
+                                  text-gray-800
+                                  border
+                                  rounded
+                                  outline-none
+                                  bg-gray-50
+                                  focus:ring
+                                  ring-emerald-500
+                                  font-poppins
+                                "
+                                name="Type" // Nombre del campo relacionado en el estado userData
+                                value={userData.Type || ''}
+                                onChange={handleFirstSelectChange}
+                              >
+                                <option value="" hidden>Selecciona Una Opción</option>
+                                <option value="Diabetes">Diabetes</option>
+                                <option value="Optimización Corporal" >Optimización Corporal</option>
+                                <option value="Obesidad" >Obesidad</option>
+                              </select>
+
+                                
+                                {/* IF EPS CLICKED SHOW SECOND SELECT */}
+
+                                {userData.Type === "EPS" && (
+                            <div className="flex flex-col mt-4">
+                                <label 
+                                className="inline-flex mb-2 text-sm text-gray-800" 
+                                htmlFor='subType' >
+                                    Selecciona tu EPS
+                                </label>
+                                <select
+                                    id='subType'
+                                    name="subType"
+                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                                    "
+                                    value={userData.subType || ""}
+                                    onChange={handleUserDataChange}
+                                >
+                                    <option value="" hidden>Selecciona una opción</option>
+                                    <option value="Nueva EPS">Nueva EPS</option>
+                                </select>
+                            </div>
+                                 )}
+
+                                {/* IF Medicina Prepagada CLICKED SHOW SECOND SELECT */}
+
+                                {userData.Type === "Medicina Prepagada" && (
+                                <div className="flex flex-col mt-4">
+                                    <label 
+                                    className="inline-flex mb-2 text-sm text-gray-800" 
+                                    htmlFor='subType' >
+                                        Selecciona a Cual Perteneces
+                                    </label>
+                                    <select
+                                        id='subType'
+                                        name="subType"
+                                        className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                                        "
+                                        value={userData.subType || ""}
+                                        onChange={handleUserDataChange}
+                                    >
+                                        <option value="" hidden>Selecciona una opción</option>
+                                        <option value="SURA">SURA</option>
+                                        <option value="RedMedical">RedMedical</option>
+                                        <option value="MediGold">MediGold</option>
+                                    </select>
+                                </div>
+                                )}
+
+                            {/* IF Visitador medico CLICKED SHOW SECOND SELECT */}
+
+                                {userData.Type === "Visitador Médico" && (
+                            <div className="flex flex-col mt-4">
+                                <label 
+                                className="inline-flex mb-2 text-sm text-gray-800" 
+                                htmlFor='subType' >
+                                    Selecciona a Cual Laboratorio Perteneces
+                                </label>
+                                <select
+                                    id='subType'
+                                    name="subType"
+                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                                    "
+                                    value={userData.subType || ""}
+                                    onChange={handleUserDataChange}
+                                >
+                                    <option value="" hidden>Selecciona una opción</option>
+                                    <option value="Boehringer Ingelheim">Boehringer Ingelheim</option>
+                                    <option value="Lilly">Lilly</option>
+                                    <option value="NovoNordisk">NovoNordisk</option>
+                                    <option value="MK">MK</option>
+                                    <option value="Pfizer">Pfizer</option>
+                                    <option value="Sanofi">Sanofi</option>
+                                    <option value="Siegfried">Siegfried</option>
+                                    <option value="Diabetrics">Diabetrics</option>
+                                    <option value="Procaps">Procaps</option>
+                                    <option value="Closter Farma">Closter Farma</option>
+                                    <option value="Bayer">Bayer</option>
+                                    <option value="Euroetika">Euroetika</option>
+                                    <option value="Huma Farmacéutica">Huma Farmacéutica</option>
+                                    <option value="Abbott">Abbott</option>
+                                </select>
+                            </div>
+                                )}
+
+                    </div>
+
+                    {/* Inputs */}
+                            
+                    {sections.map((section, index) => (
+                          <div key={section.id} className="flex gap-6">
+                                                    
+                              {/* Payment Method */}
+                              
+                              <div className="flex-1 flex-col text-left">
+                                          <label className="text-left text-sm mb-2 text-gray-800">
+                                              Métodos de Pago
+                                          </label>
+                                            <select
+                                              className="
+                                              w-full
+                                              px-3
+                                              py-2
+                                              text-gray-800
+                                              border
+                                              rounded
+                                              outline-none
+                                              bg-gray-50
+                                              focus:ring
+                                              ring-emerald-500
+                                              mt-1
+                                              "
+                                              name="Motive" // Nombre del campo relacionado en el estado userData
+                                              value={section.Motive || ''}
+                                              onChange={(e) => {
+                                                const newSections = [...sections];
+                                                newSections[section.id - 1].Motive = e.target.value;
+                                                setSections(newSections);
+                                              }}
+                                          >
+                                              <option value="" hidden>Selecciona Una Opción</option>                                            
+                                              <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                                              <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                                              <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                                              <option value="Cheques">Cheques</option>
+                                          </select>                                                                    
+                              </div>
+
+                              {/* Amount and Button + */}
+
+                              <div className='flex flex-row'>  
+
+                              <div className="flex flex-col">
+                                <label className="inline-flex text-sm mb-2 text-gray-800">
+                                  Ingresa el Monto
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="Ingresar Monto"
+                                  className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500"
+                                  // You can use section.id to uniquely identify inputs for each section
+                                  value={sections[section.id - 1].planCost || ''}
+                                  onChange={(e) => {
+                                    const newSections = [...sections];
+                                    newSections[section.id - 1].planCost = e.target.value;
+                                    setSections(newSections);
+                                  }}
+                                />
+                              </div>
+
+                                {/* More Inputs button */}
+
+                                {index === 0 && (   
+                                <div className='flex justify-center items-center mt-6 ml-4'>
+                                    <button  onClick={addSection}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                                      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" />
+                                    </svg>
+                                    </button>
+                                </div> )}
+
+                                {index >= 1 && (   
+                                <div className='flex justify-center items-center mt-6 ml-4'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-8 h-8">
+                                      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" />
+                                    </svg>
+                                </div> )}
+                            
+                              </div>
+                        </div>
+                    ))}
+                  
+            </div>
+          </>
+        );
+      case 3:
+        return (
+          <div>
+            <Calendar  
+          selectedDate={selectedDate}
+          selectedTime={selectedTime} 
+          onDateChange={handleDateChange} 
+          onTimeChange={handleTimeChange}/>
+          </div>
+        );
+      case 4:
+        return (
+          <div className='text-justify'>
+            <div class="mx-auto p-16">
+    <div className="flex items-center justify-between mb-8 px-3">
+        <div>
+          <span className="text-2xl">{userData.Type}</span> <br />
+          {selectedDate?.toLocaleDateString()}<br />
+        </div>
+        <div className="w-20">
+            <svg
+              id="Capa_2"
+              data-name="Capa 2"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 246.82 220.08"
+            >
+              <defs>
+                <style>{"\n      .cls-1 {\n        fill: #00a451;\n      }\n    "}</style>
+              </defs>
+              <g id="Capa_1-2" data-name="Capa 1">
+                <path
+                  className="cls-1"
+                  d="m246.82,220.08c-17.81-.25-34.14-12.55-46.89-32.9-10.53-16.78-18.63-39.03-23.15-64.51-2.62-14.72-4.04-30.52-4.04-46.97-2.01,4.93-4.93,11.21-7.17,18.17l-21.54,65.95c-2.3,7.06-5.07,13.84-7.89,19.39-2.47,4.89-7.49,7.97-12.97,7.97-10.09,0-19.07-7.85-24.68-24.45l-1.78-5.24v-.02l-20.2-59.57c-2.69-7.85-6.28-17.04-8.52-22.43-4.04,21.99-6.73,83.67-6.73,111.71h-10.77c-6.67,0-12.12-2.51-15.5-7.19-2.43-3.34-3.79-7.79-3.79-13.22,0-32.07,9.71-100.39,15.06-133.25.03-.17.05-.32.07-.46C31.75,15.02,15.65,3.17,0,.3c28.41-2.75,56.11,13.41,78.17,40.9,5.66,7.05,10.95,14.85,15.79,23.27,13.79,23.99,23.89,52.99,28.37,84.04-.02.09-.03.18-.05.27h-.02s.01.03.01.04c0-.01,0-.03,0-.04l.09-.03c-.01-.08-.02-.16-.04-.24,1.12-5.69,2.66-10.32,4.2-15.39l17.73-54.51c6.69-20.86,14.86-35.19,21.02-42.15,1.66-1.88,4.06-2.94,6.57-2.94,17.05,0,28.26,10.77,30.73,31.86,0,27.86,2.13,53.98,5.85,76.55,7.63,46.16,21.93,77.43,38.39,78.15Z"
+                />
+              </g>
+            </svg>
+        </div>
+      </div>
+
+      <div className="flex justify-between mb-8 px-3">
+          <div>
+        <p>Nombre: <span className='font-semibold'>{foundUser.name} {foundUser.secondName} {foundUser.lastName} {foundUser.secondLastName} </span> </p>
+        <p>Email: <span className='font-semibold'>{foundUser.email}</span> </p>
+        <p>Plan Personalizado: <span className='font-semibold'>{userData.Type} {userData.Type === "Medicina Prepagada" ? userData.subType : ""} </span> </p>
+            {userData.Type === "EPS" && (
+            <p>Método de Pago: <span className='font-semibold'> {userData.subType}</span></p>
+            )}            
+            <p>Método de Pago: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
+          </div>
+          <div className="text-right">
+          <p>Fechas Seleccionadas: <span className='font-semibold'> {selectedDate?.toLocaleDateString()}</span> </p>
+          <p>Horas Seleccionadas: <span className='font-semibold'> {formattedTime}</span> </p> 
+          </div>
+        </div>
+
+        <div className="border border-t-2 border-gray-200 mb-8 px-3"></div>
+
+        <div className="mb-8 px-3">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus aliquam vestibulum elit, id rutrum sem lobortis eget. In a massa et leo vehicula dapibus. In convallis ut nisi ut vestibulum. Integer non feugiat tellus. Nullam id ex suscipit, volutpat sapien tristique, porttitor sapien.</p>
+        </div>
+
+        <div className="flex justify-between mb-4 bg-gray-200 px-3 py-2">
+          <div>{userData.Motive.replace(/Primera vez/g, "").trim()}</div>
+          <div className="text-right font-medium">{planCost}</div>
+        </div>
+
+        <div className="flex justify-between items-center mb-2 px-3">
+          <div className="text-2xl leading-none"><span className="">Total</span>:</div>
+          <div className="text-2xl text-right font-medium">Toal</div>
+        </div>
+              
+        </div>   
+          
           </div>
         );
       default:
@@ -766,7 +1283,7 @@ const Stepper = () => {
 
         {renderStepContent()}
 
-        {((roleUser && !params.id) || roleAdmission) && (
+        {((roleUser && !params.id) || roleAdmission) && from !== '/MenuAdmission/CustomPlans' && (
            <div className='flex items-center justify-between mt-4'>
            <div>
 
@@ -816,6 +1333,90 @@ const Stepper = () => {
            </div>
            <div>
                {step < 3 ? (
+               
+               <button 
+               className="
+                   px-6
+                   py-2
+                   text-sm text-white
+               bg-emerald-700
+                   rounded-lg
+                   outline-none
+               hover:bg-emerald-800
+               ring-indigo-300
+                           "
+               onClick={handleNextStep}>Siguiente Paso</button>
+               
+               )
+               : (
+                 <button 
+                   className="
+                   px-6
+                   py-2
+                   text-sm text-white
+                   bg-emerald-700
+                   rounded-lg
+                   outline-none
+                   hover:bg-emerald-800
+                   ring-indigo-300"
+                   onClick={handleConfirmCita}
+                   disabled={isButtonDisabled}
+                   >{ params.id ? <span>Re-Agendar Cita</span> : <span>Confirmar Cita</span> }</button>        
+               )}
+           </div>
+       </div>
+        )}
+
+        {(from === '/MenuAdmission/CustomPlans' && foundUser) &&  (
+           <div className='flex items-center justify-between mt-4'>
+           <div>
+
+             {step <= 1 && (
+               
+               <button
+               to="/Menu"
+               className="
+               inline-flex
+               items-center
+               px-6
+               py-2
+               text-sm text-gray-800
+               rounded-lg
+               shadow
+               outline-none
+               gap-x-1
+               bg-gray-100
+               hover:bg-gray-200
+               "
+               onClick={() => navigate(-1)}>Volver
+               
+             </button>
+
+             )}
+           
+               {step > 1 && (
+                   
+               <button 
+               className="
+               inline-flex
+               items-center
+               px-6
+               py-2
+               text-sm text-gray-800
+               rounded-lg
+               shadow
+               outline-none
+               gap-x-1
+               bg-gray-100
+               hover:bg-gray-200
+               "
+               onClick={handlePreviousStep}
+               >Paso Anterior</button>
+           
+               )}
+           </div>
+           <div>
+               {step < 4 ? (
                
                <button 
                className="
