@@ -15,6 +15,7 @@ const BookingProvider = ({children}) => {
     const navigate = useNavigate();
     const {auth} = useAuth();
     const isAdmission = auth.role === "Admission";
+    const isAdmin = auth.role === "Admin"
     const isUser = auth.role === "User";
 
     useEffect(() => {
@@ -129,7 +130,7 @@ const BookingProvider = ({children}) => {
                 });
               
             setTimeout(() => {
-                if (isAdmission) {
+                if (isAdmission || isAdmin) {
                     navigate("/MenuAdmission/Today")
                 } 
 
@@ -168,7 +169,7 @@ const BookingProvider = ({children}) => {
 
                 setBookings((prevBookings) => [...prevBookings, data])
 
-                if (isAdmission) {
+                if (isAdmission || isAdmin) {
                     navigate("/MenuAdmission")
                 } 
     
@@ -303,6 +304,39 @@ const BookingProvider = ({children}) => {
         dateFromBackend({})
     }
 
+
+    /* Funcion de crear nuevos planes */
+
+    const newPlan = async (planData, dataAction) => {
+
+        try {
+            const token = localStorage.getItem('token')
+
+            if(!token) {
+                return
+            }
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const { data } = await costumerAxios.post('/newplan', planData, config)
+
+            await costumerAxios.post('/subscriptionplan', dataAction, config)
+                            
+            setTimeout( () => {
+                navigate("/MenuAdmission/CustomPlans")                 
+            }, 3000 )             
+
+        
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
   return (
     <>
     <BookingContext.Provider
@@ -316,7 +350,8 @@ const BookingProvider = ({children}) => {
             allBookings,
             updateStatus,
             closeSessionBooking,
-            massiveReBooking
+            massiveReBooking,
+            newPlan
     }}
     > {children}
     </BookingContext.Provider>

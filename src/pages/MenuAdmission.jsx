@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom"
+import useAuth from "../hooks/useAuth"
 
 
 const MenuAdmission = () => {
+
+  const { auth } = useAuth()
 
   return (
    
@@ -50,7 +53,7 @@ const MenuAdmission = () => {
 
           
           <Link 
-            to="#"
+            to={auth.role === "Admin" ? '/MenuAdmission/CustomPlans' : '#'}
             className='flex justify-center items-center gap-4 rounded-xl bg-gray-200 shadow-md shadow-gray-600 transition ease-in-out delay-100 hover:-translate-y-1 hover:scale-95 duration-300 p-12 w-full h-full text-center'>
               Planes Especializados
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

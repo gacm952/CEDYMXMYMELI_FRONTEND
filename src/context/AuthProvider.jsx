@@ -11,6 +11,7 @@ const AuthProvider = ({children}) => {
     const [loading, setLoading] =useState(true)
     const navigate = useNavigate()
     const isAdmission = auth.role === "Admission"
+    const isAdmin = auth.role === "Admin"
     const isUser = auth.role === "User"
 
     useEffect(() => {     
@@ -76,12 +77,14 @@ const AuthProvider = ({children}) => {
     }, [])
 
     useEffect(() => {
-        if (!loading && auth && isAdmission) {
-          navigate('/MenuAdmission'); 
-        } else if (!loading && auth && isUser) {
-          navigate('/Menu'); 
+        if (!loading && auth) {
+          if (isAdmission || isAdmin) {
+            navigate('/MenuAdmission'); 
+          } else if (isUser) {
+            navigate('/Menu'); 
+          }
         }
-      }, [loading, auth, isAdmission]);
+      }, [loading, auth, isAdmission, isAdmin, isUser]);
 
     const submitResposable = async (userID, dataAction) => {
         try {

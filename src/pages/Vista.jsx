@@ -125,7 +125,7 @@ const filteredBookings = useMemo(() => {
 
   return allBookings.filter((booking) => {
     const bookingDate = booking.dateHour.slice(0, 10);
-    const bookingType = booking.Type.toLowerCase();
+    const bookingType = booking.Type ? booking.Type.toLowerCase() : '';    
     const bookingSubType = booking.subType?.toLowerCase();
     const bookingMotive = booking.Motive.toLowerCase();
     const bookingUser = allUsers.find(user => user._id === booking.bookingTo);

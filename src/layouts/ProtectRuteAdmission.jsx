@@ -35,7 +35,7 @@ const ProtectRuteAdmission = () => {
 
   return (
     <>
-    {auth.role === "Admission" ? (
+    {(auth.role === "Admission" || auth.role === "Admin") ? (
       <div className="w-full sm:block min-w-600">
 
         {isMobile && mobileMessage}

@@ -44,6 +44,7 @@ const Register = () => {
   const navigate = useNavigate();
   const roleUser = [auth].some((role) => role.role === "User")
   const roleAdmission = [auth].some((role) => role.role === "Admission")
+  const roleAdmin = [auth].some((role) => role.role === "Admin")
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -227,7 +228,6 @@ const Register = () => {
 
       const lowerCaseEmail = email ? toLowerCaseEmail(email) : "";
 
-
       setAlert({})
 
       // Crear el User
@@ -305,7 +305,7 @@ const Register = () => {
         setLastName1('')
         setSecondLastName1('')
 
-      } catch (error) {
+      } catch (error) {        
         setAlert({
           msg: error.response.data.msg,
           error: true
@@ -366,7 +366,7 @@ const Register = () => {
   return (
     <>
 
-    {roleAdmission && (
+    {(roleAdmission || roleAdmin) && (
         <section className='w-full min-h-screen my-32 flex-grow flex justify-center items-center'>
 
         <Modal8 isOpen={isModalOpen} onClose={closeModal} />

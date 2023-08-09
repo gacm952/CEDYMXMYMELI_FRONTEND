@@ -8,11 +8,13 @@ const { bookings } = useBookings();
 
 const isDateActive = bookings.some(booking => booking.Status === "Active")
 
+console.log(bookings, isDateActive)
+
     return (
       <>
 
       <div>
-        <div className="justify-center place-items-center h-screen items-center align-middle flex flex-col flex-wrap">
+        <div className="mx-auto justify-center place-items-center flex my-12">
             <div className="text-center">
               <div>
 
@@ -24,7 +26,7 @@ const isDateActive = bookings.some(booking => booking.Status === "Active")
                 </Link>
               </div>
               
-                <div className="px-4 md:px-8">
+                <div>
                   <header className="my-8">
                     <h2 className=" mb-4 text-2xl font-bold text-center text-gray-800 lg:text-2xl md:mb-6" >
                     {isDateActive ? 
@@ -32,13 +34,13 @@ const isDateActive = bookings.some(booking => booking.Status === "Active")
                     : <p> No Tienes Aún Citas Agendadas.</p>}
                     </h2>
                   </header>
-                  <div className="min-w-[300px] bg-gray-100 shadow mt-10 rounded-lg">
+                  <div className="min-w-[200px] grid grid-cols-1 gap-y-6 gap-x-4 xl:grid-cols-2 2xl:grid-cols-3 xl:gap-4 rounded-lg">
                     {isDateActive ? 
                       bookings
                       .filter(booking => booking.Status === "Active")
                       .map((booking) => 
                         <PreviewBooking key={booking._id} booking={booking}/>
-                      ).slice(0, 1)
+                      )
                     : <p className="p-8 bg-gray-100 shadow mt-10 rounded-lg">No tienes aún ninguna cita </p> }
                   </div>
                 </div>

@@ -18,6 +18,8 @@ const [isModalOpen1, setIsModalOpen1] = useState(false);
 const { auth } = useAuth()
 const navigate = useNavigate()
 
+console.log(booking)
+
 const parseDate = parseISO(dateHour);
 const formattedDate = format(parseDate, 'dd/MM/yyyy');
 const formattedHour = format(parseDate, 'HH:mm');
@@ -119,7 +121,7 @@ const { msg } = alert
 
             {msg && <Alert alert={alert}/> }
 
-    <div className="border-b p-12 gap-16 rounded-xl shadow-md shadow-gray-600 flex flex-col sm:flex-row justify-between">     
+    <div className="border-b p-12 gap-8 rounded-xl shadow-md shadow-gray-600 flex flex-col xl:flex-row justify-between">     
         <div className='text-left'>
             <p>Tipo de Paciente: <span className='font-semibold'> {Type} {Type === "Medicina Prepagada" ? subType : ""} </span></p>
              { subType && 
@@ -130,7 +132,7 @@ const { msg } = alert
             <p>Hora Seleccionada: <span className='font-semibold'> {formattedHour} </span> </p>
         </div>
 
-        <div className="flex justify-center sm:flex-col gap-4 items-center font-semibold">
+        <div className="flex justify-center xl:flex-col gap-4 items-center font-semibold">
         <div className="flex gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
             <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32l8.4-8.4z" />

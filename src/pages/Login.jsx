@@ -53,7 +53,7 @@ const Login = () => {
       }) 
 
       setTimeout(() => {
-        if (data.role === "Admission") {
+        if (data.role === "Admission" || data.role === "Admin") {
           navigate('/MenuAdmission')
         } else {
           if (data.role === "User") {

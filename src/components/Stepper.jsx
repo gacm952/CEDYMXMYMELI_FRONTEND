@@ -43,17 +43,21 @@ const Stepper = () => {
   const [planCost, setPlantCost] = useState(0);
   const [planCost2, setPlantCost2] = useState(0);
   const [sections, setSections] = useState([{ id: 1 }]); // Initial section
-
-  console.log(sections, planCost)
+  const [monthsToPay, setMonthsToPay] = useState(0);
 
   const formattedTime = selectedTime ? format(selectedTime, 'h:mm a') : null;
+  const paymentMethod = sections.map(section => `${section.Motive}${section.subMotive ? ` ${section.subMotive}` : ''} ${section.planCost}`
+  ).join(', ');
+
+  console.log(sections, paymentMethod)
 
   const navigate = useNavigate();
   const params = useParams()
-  const { allBookings, submitBooking, bookings } = useBookings();
+  const { allBookings, submitBooking, bookings, newPlan } = useBookings();
   const { auth, allUsers } = useAuth();
   const roleUser = [auth].some((role) => role.role === "User")
   const roleAdmission = [auth].some((role) => role.role === "Admission")
+  const roleAdmin = [auth].some((role) => role.role === "Admin")
 
   const isResponsable = [auth].some((role) => role.responsable === true)
   const bookingData = allBookings.find(booking => booking._id === params.id) 
@@ -152,6 +156,14 @@ const Stepper = () => {
     if (totalPlantCost < 3500000) {
       setAlert({
         msg: 'El monto debe llegar al mínimo permitido.',
+        error: true,
+      });
+      return;
+    }
+
+    if (monthsToPay == 0) {
+      setAlert({
+        msg: 'El mínimo de meses a pagar no puede ser 0',
         error: true,
       });
       return;
@@ -282,7 +294,7 @@ const Stepper = () => {
 
         // Verificar si el usuario autenticado es un Visitador Médico si es desde Admission
 
-        if (roleAdmission) {
+        if (roleAdmission || roleAdmin) {
           if (userData.Type === "Visitador Médico") {
     
             // Obtener las citas programadas del Visitador Médico para la fecha seleccionada
@@ -319,7 +331,7 @@ const Stepper = () => {
 
     let updatedMotive;
 
-    if (roleAdmission) {
+    if (roleAdmission || roleAdmin) {
 
       // Determinar el valor adecuado para la propiedad Motive
 
@@ -368,37 +380,99 @@ const Stepper = () => {
     
 
     const target = bookingData?.bookingTo || bookingData?.bookingFor || auth._id
+    const paymentMethod = sections.map(section => `${section.Motive}${section.subMotive ? ` ${section.subMotive}` : ''} ${section.planCost}`).join(', ');
 
     // Pasar los datos hacia el provider
 
     try {
 
-      setIsModalOpen2(true)
+      // Nuevo plan
+      if (monthsToPay != 0) {
 
-      const bookingData1 = {
-        dateHour,
-        Type,
-        subType,
-        Motive: updatedMotive,
-        bookingTo: foundUserId,
-        bookingToName: foundUserName || bookingData?.bookingToName || auth.name,
-        bookingToLastName: foundUserLastName || bookingData?.bookingToLastName || auth.lastName,
-        bookingToEmail: foundUserEmail || bookingData?.bookingToEmail || auth.email,
-      };
-      
-      if (id !== null) {
-        bookingData1.id = id;
+      const planData = {
+                        soldBy: auth._id, 
+                        Target: foundUser._id, 
+                        typeOfDocument: foundUser.typeDocument, 
+                        Document: foundUser.document, 
+                        Plan: Type, 
+                        startDate: dateHour, 
+                        paymentMethod: paymentMethod, 
+                        Status: "Active",
+                      }
+        
+      const actionPlan = {
+          realizedBy: auth._id, 
+          Target: target, 
+          Action: `Nueva subscripcion a ${Type}` 
       }
-      
-      submitBooking(bookingData1, {realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
-      
-      setAlert({
-      msg: 'Cita agendada correctamente, ¡te esperamos!',
-      error: false,
-      });
 
-      setIsButtonDisabled(true);
-      
+          newPlan(planData, actionPlan)
+        }
+
+      // Si se van a generar citas múltiples
+
+      if (monthsToPay && monthsToPay > 1) {
+        const appointments = [];
+  
+        for (let i = 0; i < monthsToPay; i++) {
+          const newDateHour = new Date(dateHour);
+          newDateHour.setMonth(dateHour.getMonth() + i);
+    
+          appointments.push(newDateHour);
+        }
+  
+        appointments.forEach((appointment) => {
+          const bookingData1 = {
+            dateHour: appointment,
+            Type: Type, 
+            Motive: "Planes Personalizados",
+            bookingTo: foundUserId,
+            bookingToName: foundUserName || bookingData?.bookingToName || auth.name,
+            bookingToLastName: foundUserLastName || bookingData?.bookingToLastName || auth.lastName,
+            bookingToEmail: foundUserEmail || bookingData?.bookingToEmail || '',
+          };
+  
+          if (id !== null) {
+            bookingData1.id = id;
+          }
+
+          submitBooking(bookingData1, { realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
+
+          setAlert({
+          msg: 'Cita agendada correctamente, ¡te esperamos!',
+          error: false,
+          });
+
+          setIsButtonDisabled(true);
+        }); 
+      } else {
+
+        // Si es una cita individual
+
+        const bookingData1 = {
+          dateHour,
+          Type,
+          subType,
+          Motive: updatedMotive || "Planes Personalizados",
+          bookingTo: foundUserId,
+          bookingToName: foundUserName || bookingData?.bookingToName || auth.name,
+          bookingToLastName: foundUserLastName || bookingData?.bookingToLastName || auth.lastName,
+          bookingToEmail: foundUserEmail || bookingData?.bookingToEmail || '',
+        };
+  
+        if (id !== null) {
+          bookingData1.id = id;
+        }
+  
+        submitBooking(bookingData1, { realizedBy: auth._id, Target: target, Action: `${Motive} para el ${formattedDateHour}` });
+        
+        setAlert({
+          msg: 'Cita agendada correctamente, ¡te esperamos!',
+          error: false,
+          });
+
+        setIsButtonDisabled(true);
+      }
     } catch (error) {
       setIsModalOpen2(false)
 
@@ -705,7 +779,7 @@ const Stepper = () => {
 
   const renderStepContent = () => {
 
-    if ((roleUser && !params.id) || (roleAdmission && from !== '/MenuAdmission/CustomPlans')) {
+    if ((roleUser && !params.id) || ((roleAdmission || roleAdmin) && from !== '/MenuAdmission/CustomPlans')) {
     switch (step) {
       case 1:
         return (
@@ -950,7 +1024,8 @@ const Stepper = () => {
                     
                     {/* Plans to choose */}
 
-                    <div className="flex flex-col mb-4">
+                    <div className="flex flex-row mb-4 gap-4 text-left">
+                          <div className='flex-[100%] '>
                               <label
                                 className="inline-flex mb-2 text-sm text-gray-800"
                                 htmlFor='type' 
@@ -958,7 +1033,7 @@ const Stepper = () => {
                               >
                               <select
                                 id='type'
-                                className="
+                                className="                               
                                   w-full
                                   px-3
                                   py-2
@@ -980,94 +1055,37 @@ const Stepper = () => {
                                 <option value="Optimización Corporal" >Optimización Corporal</option>
                                 <option value="Obesidad" >Obesidad</option>
                               </select>
+                          </div>
 
-                                
-                                {/* IF EPS CLICKED SHOW SECOND SELECT */}
-
-                                {userData.Type === "EPS" && (
-                            <div className="flex flex-col mt-4">
-                                <label 
-                                className="inline-flex mb-2 text-sm text-gray-800" 
-                                htmlFor='subType' >
-                                    Selecciona tu EPS
-                                </label>
-                                <select
-                                    id='subType'
-                                    name="subType"
-                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
-                                    "
-                                    value={userData.subType || ""}
-                                    onChange={handleUserDataChange}
-                                >
-                                    <option value="" hidden>Selecciona una opción</option>
-                                    <option value="Nueva EPS">Nueva EPS</option>
-                                </select>
-                            </div>
-                                 )}
-
-                                {/* IF Medicina Prepagada CLICKED SHOW SECOND SELECT */}
-
-                                {userData.Type === "Medicina Prepagada" && (
-                                <div className="flex flex-col mt-4">
-                                    <label 
-                                    className="inline-flex mb-2 text-sm text-gray-800" 
-                                    htmlFor='subType' >
-                                        Selecciona a Cual Perteneces
-                                    </label>
-                                    <select
-                                        id='subType'
-                                        name="subType"
-                                        className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
-                                        "
-                                        value={userData.subType || ""}
-                                        onChange={handleUserDataChange}
-                                    >
-                                        <option value="" hidden>Selecciona una opción</option>
-                                        <option value="SURA">SURA</option>
-                                        <option value="RedMedical">RedMedical</option>
-                                        <option value="MediGold">MediGold</option>
-                                    </select>
-                                </div>
-                                )}
-
-                            {/* IF Visitador medico CLICKED SHOW SECOND SELECT */}
-
-                                {userData.Type === "Visitador Médico" && (
-                            <div className="flex flex-col mt-4">
-                                <label 
-                                className="inline-flex mb-2 text-sm text-gray-800" 
-                                htmlFor='subType' >
-                                    Selecciona a Cual Laboratorio Perteneces
-                                </label>
-                                <select
-                                    id='subType'
-                                    name="subType"
-                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
-                                    "
-                                    value={userData.subType || ""}
-                                    onChange={handleUserDataChange}
-                                >
-                                    <option value="" hidden>Selecciona una opción</option>
-                                    <option value="Boehringer Ingelheim">Boehringer Ingelheim</option>
-                                    <option value="Lilly">Lilly</option>
-                                    <option value="NovoNordisk">NovoNordisk</option>
-                                    <option value="MK">MK</option>
-                                    <option value="Pfizer">Pfizer</option>
-                                    <option value="Sanofi">Sanofi</option>
-                                    <option value="Siegfried">Siegfried</option>
-                                    <option value="Diabetrics">Diabetrics</option>
-                                    <option value="Procaps">Procaps</option>
-                                    <option value="Closter Farma">Closter Farma</option>
-                                    <option value="Bayer">Bayer</option>
-                                    <option value="Euroetika">Euroetika</option>
-                                    <option value="Huma Farmacéutica">Huma Farmacéutica</option>
-                                    <option value="Abbott">Abbott</option>
-                                </select>
-                            </div>
-                                )}
-
+                          <div className="flex flex-[20%] flex-col mb-4">
+                              <label
+                                className="inline-flex mb-2 text-sm text-gray-800"
+                                htmlFor='type' 
+                              >Meses a pagar</label
+                              >
+                              <input
+                                type='Number'
+                                id='type'
+                                className="
+                                  w-full
+                                  px-3
+                                  py-2
+                                  text-gray-800
+                                  border
+                                  rounded
+                                  outline-none
+                                  bg-gray-50
+                                  focus:ring
+                                  ring-emerald-500
+                                  font-poppins
+                                "
+                                value={monthsToPay}
+                                onChange={e => setMonthsToPay(e.target.value)}
+                              >
+                              </input>
+                          </div>
                     </div>
-
+                  
                     {/* Inputs */}
                             
                     {sections.map((section, index) => (
@@ -1075,7 +1093,8 @@ const Stepper = () => {
                                                     
                               {/* Payment Method */}
                               
-                              <div className="flex-1 flex-col text-left">
+                              <div className="flex flex-row gap-4 text-left mb-4">
+                                        <div>
                                           <label className="text-left text-sm mb-2 text-gray-800">
                                               Métodos de Pago
                                           </label>
@@ -1102,11 +1121,89 @@ const Stepper = () => {
                                               }}
                                           >
                                               <option value="" hidden>Selecciona Una Opción</option>                                            
-                                              <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
-                                              <option value="Tarjeta de Débito">Tarjeta de Débito</option>
-                                              <option value="Transferencia Bancaria">Transferencia Bancaria</option>
-                                              <option value="Cheques">Cheques</option>
-                                          </select>                                                                    
+                                              <option value="Datáfono">Datáfono</option>
+                                              <option value="Efectivo">Efectivo</option>
+                                              <option value="Transferencia">Transferencia</option>
+                                              <option value="Financiado">Financiado</option>
+                                          </select> 
+                                        </div> 
+
+                                          {section.Motive === "Datáfono" && (
+                                            <div className="flex-[60%] flex-col">
+                                                <label 
+                                                className="inline-flex mb-2 text-sm text-gray-800" 
+                                                htmlFor='subType' >
+                                                    Selecciona tu EPS
+                                                </label>
+                                                <select
+                                                    id='subType'
+                                                    name="subType"
+                                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                                                    "
+                                                    value={section.subMotive || ''}
+                                                    onChange={(e) => {
+                                                      const newSections = [...sections];
+                                                      newSections[section.id - 1].subMotive = e.target.value;
+                                                      setSections(newSections);
+                                                    }}
+                                                >
+                                                    <option value="" hidden>Selecciona una opción</option>
+                                                    <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                                                    <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                                                </select>
+                                            </div>
+                                          )}  
+
+                                          {section.Motive === "Transferencia" && (
+                                            <div className="flex-[60%] flex-col">
+                                                <label 
+                                                className="inline-flex mb-2 text-sm text-gray-800" 
+                                                htmlFor='subType' >
+                                                    Selecciona tu EPS
+                                                </label>
+                                                <select
+                                                    id='subType'
+                                                    name="subType"
+                                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                                                    "
+                                                    value={section.subMotive || ''}
+                                                    onChange={(e) => {
+                                                      const newSections = [...sections];
+                                                      newSections[section.id - 1].subMotive = e.target.value;
+                                                      setSections(newSections);
+                                                    }}
+                                                >
+                                                    <option value="" hidden>Selecciona una opción</option>
+                                                    <option value="Bancolombia">Bancolombia</option>
+                                                    <option value="Davivienda">Davivienda</option>
+                                                </select>
+                                            </div>
+                                          )}    
+
+                                          {section.Motive === "Financiado" && (
+                                            <div className="flex-[60%] flex-col">
+                                                <label 
+                                                className="inline-flex mb-2 text-sm text-gray-800" 
+                                                htmlFor='subType' >
+                                                    Selecciona tu EPS
+                                                </label>
+                                                <select
+                                                    id='subType'
+                                                    name="subType"
+                                                    className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500
+                                                    "
+                                                    value={section.subMotive || ''}
+                                                    onChange={(e) => {
+                                                      const newSections = [...sections];
+                                                      newSections[section.id - 1].subMotive = e.target.value;
+                                                      setSections(newSections);
+                                                    }}
+                                                >
+                                                    <option value="" hidden>Selecciona una opción</option>
+                                                    <option value="Sistecredito">Sistecredito</option>
+                                                </select>
+                                            </div>
+                                          )}                                                                  
                               </div>
 
                               {/* Amount and Button + */}
@@ -1134,7 +1231,7 @@ const Stepper = () => {
                                 {/* More Inputs button */}
 
                                 {index === 0 && (   
-                                <div className='flex justify-center items-center mt-6 ml-4'>
+                                <div className='flex justify-center items-center mt-3.5 ml-4'>
                                     <button  onClick={addSection}>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
                                       <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" />
@@ -1142,12 +1239,13 @@ const Stepper = () => {
                                     </button>
                                 </div> )}
 
-                                {index >= 1 && (   
+                               {/*  {index >= 1 && (   
                                 <div className='flex justify-center items-center mt-6 ml-4'>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-8 h-8">
                                       <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" />
                                     </svg>
                                 </div> )}
+                                */}
                             
                               </div>
                         </div>
@@ -1170,67 +1268,68 @@ const Stepper = () => {
         return (
           <div className='text-justify'>
             <div class="mx-auto p-16">
-    <div className="flex items-center justify-between mb-8 px-3">
-        <div>
-          <span className="text-2xl">{userData.Type}</span> <br />
-          {selectedDate?.toLocaleDateString()}<br />
-        </div>
-        <div className="w-20">
-            <svg
-              id="Capa_2"
-              data-name="Capa 2"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 246.82 220.08"
-            >
-              <defs>
-                <style>{"\n      .cls-1 {\n        fill: #00a451;\n      }\n    "}</style>
-              </defs>
-              <g id="Capa_1-2" data-name="Capa 1">
-                <path
-                  className="cls-1"
-                  d="m246.82,220.08c-17.81-.25-34.14-12.55-46.89-32.9-10.53-16.78-18.63-39.03-23.15-64.51-2.62-14.72-4.04-30.52-4.04-46.97-2.01,4.93-4.93,11.21-7.17,18.17l-21.54,65.95c-2.3,7.06-5.07,13.84-7.89,19.39-2.47,4.89-7.49,7.97-12.97,7.97-10.09,0-19.07-7.85-24.68-24.45l-1.78-5.24v-.02l-20.2-59.57c-2.69-7.85-6.28-17.04-8.52-22.43-4.04,21.99-6.73,83.67-6.73,111.71h-10.77c-6.67,0-12.12-2.51-15.5-7.19-2.43-3.34-3.79-7.79-3.79-13.22,0-32.07,9.71-100.39,15.06-133.25.03-.17.05-.32.07-.46C31.75,15.02,15.65,3.17,0,.3c28.41-2.75,56.11,13.41,78.17,40.9,5.66,7.05,10.95,14.85,15.79,23.27,13.79,23.99,23.89,52.99,28.37,84.04-.02.09-.03.18-.05.27h-.02s.01.03.01.04c0-.01,0-.03,0-.04l.09-.03c-.01-.08-.02-.16-.04-.24,1.12-5.69,2.66-10.32,4.2-15.39l17.73-54.51c6.69-20.86,14.86-35.19,21.02-42.15,1.66-1.88,4.06-2.94,6.57-2.94,17.05,0,28.26,10.77,30.73,31.86,0,27.86,2.13,53.98,5.85,76.55,7.63,46.16,21.93,77.43,38.39,78.15Z"
-                />
-              </g>
-            </svg>
-        </div>
-      </div>
+              <div className="flex items-center justify-between mb-8 px-3">
+              <div>
+                <span className="text-2xl">Subscripción a {userData.Type}</span> <br />
+                {selectedDate?.toLocaleDateString()}<br />
+              </div>
+              <div className="w-20">
+                  <svg
+                    id="Capa_2"
+                    data-name="Capa 2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 246.82 220.08"
+                  >
+                    <defs>
+                      <style>{"\n      .cls-1 {\n        fill: #00a451;\n      }\n    "}</style>
+                    </defs>
+                    <g id="Capa_1-2" data-name="Capa 1">
+                      <path
+                        className="cls-1"
+                        d="m246.82,220.08c-17.81-.25-34.14-12.55-46.89-32.9-10.53-16.78-18.63-39.03-23.15-64.51-2.62-14.72-4.04-30.52-4.04-46.97-2.01,4.93-4.93,11.21-7.17,18.17l-21.54,65.95c-2.3,7.06-5.07,13.84-7.89,19.39-2.47,4.89-7.49,7.97-12.97,7.97-10.09,0-19.07-7.85-24.68-24.45l-1.78-5.24v-.02l-20.2-59.57c-2.69-7.85-6.28-17.04-8.52-22.43-4.04,21.99-6.73,83.67-6.73,111.71h-10.77c-6.67,0-12.12-2.51-15.5-7.19-2.43-3.34-3.79-7.79-3.79-13.22,0-32.07,9.71-100.39,15.06-133.25.03-.17.05-.32.07-.46C31.75,15.02,15.65,3.17,0,.3c28.41-2.75,56.11,13.41,78.17,40.9,5.66,7.05,10.95,14.85,15.79,23.27,13.79,23.99,23.89,52.99,28.37,84.04-.02.09-.03.18-.05.27h-.02s.01.03.01.04c0-.01,0-.03,0-.04l.09-.03c-.01-.08-.02-.16-.04-.24,1.12-5.69,2.66-10.32,4.2-15.39l17.73-54.51c6.69-20.86,14.86-35.19,21.02-42.15,1.66-1.88,4.06-2.94,6.57-2.94,17.05,0,28.26,10.77,30.73,31.86,0,27.86,2.13,53.98,5.85,76.55,7.63,46.16,21.93,77.43,38.39,78.15Z"
+                      />
+                    </g>
+                  </svg>
+              </div>
+              </div>
 
-      <div className="flex justify-between mb-8 px-3">
-          <div>
-        <p>Nombre: <span className='font-semibold'>{foundUser.name} {foundUser.secondName} {foundUser.lastName} {foundUser.secondLastName} </span> </p>
-        <p>Email: <span className='font-semibold'>{foundUser.email}</span> </p>
-        <p>Plan Personalizado: <span className='font-semibold'>{userData.Type} {userData.Type === "Medicina Prepagada" ? userData.subType : ""} </span> </p>
-            {userData.Type === "EPS" && (
-            <p>Método de Pago: <span className='font-semibold'> {userData.subType}</span></p>
-            )}            
-            <p>Método de Pago: <span className='font-semibold'>{userData.Motive.replace(/Primera vez/g, "").trim()}</span> </p>
+              <div className="flex justify-between mb-8 px-3">
+                <div>
+                  <p>Nombre: <span className='font-semibold'>{foundUser.name} {foundUser.secondName} {foundUser.lastName} {foundUser.secondLastName} </span> </p>
+                  <p>Email: <span className='font-semibold'>{foundUser.email}</span> </p>
+                  <p>Plan Personalizado: <span className='font-semibold'>{userData.Type}</span> </p>        
+                </div>
+                <div className="text-right">
+                  <p>Fechas Seleccionadas: <span className='font-semibold'> {selectedDate?.toLocaleDateString()}</span> </p>
+                  <p>Horas Seleccionadas: <span className='font-semibold'> {formattedTime}</span> </p> 
+                </div>
+              </div>
+
+              <div className="border border-t-2 border-gray-200 mb-8 px-3"></div>
+
+              <div className="mb-8 px-3">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus aliquam vestibulum elit, id rutrum sem lobortis eget. In a massa et leo vehicula dapibus. In convallis ut nisi ut vestibulum. Integer non feugiat tellus. Nullam id ex suscipit, volutpat sapien tristique, porttitor sapien.</p>
+              </div>
+
+              {sections.map((section) => (
+                <div key={section.id} className="flex justify-between mb-4 bg-gray-200 px-3 py-2">
+                  <div>
+                  {section.Motive}  
+                  {section.subMotive ? ` - ${section.subMotive}` 
+                  : ''} </div>
+                  <div className="text-right font-medium">{section.planCost}</div>
+                </div>
+              ))}
+
+              <div className="flex justify-between items-center mb-2 px-3">
+                <div className="text-2xl leading-none"><span className="">Total</span>:</div>
+                <div className="text-2xl text-right font-medium">
+                {sections.reduce((total, section) => total + parseFloat(section.planCost), 0)}
+                  </div>
+              </div>          
+            </div>  
           </div>
-          <div className="text-right">
-          <p>Fechas Seleccionadas: <span className='font-semibold'> {selectedDate?.toLocaleDateString()}</span> </p>
-          <p>Horas Seleccionadas: <span className='font-semibold'> {formattedTime}</span> </p> 
-          </div>
-        </div>
-
-        <div className="border border-t-2 border-gray-200 mb-8 px-3"></div>
-
-        <div className="mb-8 px-3">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus aliquam vestibulum elit, id rutrum sem lobortis eget. In a massa et leo vehicula dapibus. In convallis ut nisi ut vestibulum. Integer non feugiat tellus. Nullam id ex suscipit, volutpat sapien tristique, porttitor sapien.</p>
-        </div>
-
-        <div className="flex justify-between mb-4 bg-gray-200 px-3 py-2">
-          <div>{userData.Motive.replace(/Primera vez/g, "").trim()}</div>
-          <div className="text-right font-medium">{planCost}</div>
-        </div>
-
-        <div className="flex justify-between items-center mb-2 px-3">
-          <div className="text-2xl leading-none"><span className="">Total</span>:</div>
-          <div className="text-2xl text-right font-medium">Toal</div>
-        </div>
-              
-        </div>   
-          
-          </div>
-        );
+                );
       default:
         return null;
     }
@@ -1283,7 +1382,7 @@ const Stepper = () => {
 
         {renderStepContent()}
 
-        {((roleUser && !params.id) || roleAdmission) && from !== '/MenuAdmission/CustomPlans' && (
+        {((roleUser && !params.id) || (roleAdmission || roleAdmin)) && from !== '/MenuAdmission/CustomPlans' && (
            <div className='flex items-center justify-between mt-4'>
            <div>
 
