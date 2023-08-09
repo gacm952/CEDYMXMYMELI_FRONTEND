@@ -42,14 +42,14 @@ const Stepper = () => {
   const [foundUser, setFoundUser] = useState(null);
   const [planCost, setPlantCost] = useState(0);
   const [planCost2, setPlantCost2] = useState(0);
-  const [sections, setSections] = useState([{ id: 1 }]); // Initial section
-  const [monthsToPay, setMonthsToPay] = useState(0);
+  const [sections, setSections] = useState([{ id: 1, Motive: '', subMotive: '', planCost: '' }]); // Initial section
+  const [monthsToPay, setMonthsToPay] = useState(3);
 
   const formattedTime = selectedTime ? format(selectedTime, 'h:mm a') : null;
   const paymentMethod = sections.map(section => `${section.Motive}${section.subMotive ? ` ${section.subMotive}` : ''} ${section.planCost}`
   ).join(', ');
 
-  console.log(sections, paymentMethod)
+  console.log(sections, paymentMethod, monthsToPay)
 
   const navigate = useNavigate();
   const params = useParams()
@@ -108,10 +108,26 @@ const Stepper = () => {
 
   
   const addSection = () => {
-    const newSectionId = sections.length + 1;
-    setSections([...sections, { id: newSectionId }]);
-  };
+    if (sections.length >= 5) {
+      return; // Do not add more sections if the limit is reached
+    }
 
+    const newSectionId = sections.length + 1;
+    setSections([...sections, { id: newSectionId, Motive: '', subMotive: '', planCost: '' }]);
+  };
+  
+  const deleteSection = (sectionId) => {
+    const updatedSections = sections.filter(section => section.id !== sectionId);
+    
+    // Update IDs of remaining sections
+    const updatedSectionsWithIds = updatedSections.map((section, index) => ({
+      ...section,
+      id: index + 1,
+    }));
+    
+    setSections(updatedSectionsWithIds);
+  };
+  
   const handleNextStep = () => {
     
     // Validar campos antes de pasar al siguiente paso
@@ -1056,34 +1072,6 @@ const Stepper = () => {
                                 <option value="Obesidad" >Obesidad</option>
                               </select>
                           </div>
-
-                          <div className="flex flex-[20%] flex-col mb-4">
-                              <label
-                                className="inline-flex mb-2 text-sm text-gray-800"
-                                htmlFor='type' 
-                              >Meses a pagar</label
-                              >
-                              <input
-                                type='Number'
-                                id='type'
-                                className="
-                                  w-full
-                                  px-3
-                                  py-2
-                                  text-gray-800
-                                  border
-                                  rounded
-                                  outline-none
-                                  bg-gray-50
-                                  focus:ring
-                                  ring-emerald-500
-                                  font-poppins
-                                "
-                                value={monthsToPay}
-                                onChange={e => setMonthsToPay(e.target.value)}
-                              >
-                              </input>
-                          </div>
                     </div>
                   
                     {/* Inputs */}
@@ -1116,7 +1104,7 @@ const Stepper = () => {
                                               value={section.Motive || ''}
                                               onChange={(e) => {
                                                 const newSections = [...sections];
-                                                newSections[section.id - 1].Motive = e.target.value;
+                                                newSections[index].Motive = e.target.value;
                                                 setSections(newSections);
                                               }}
                                           >
@@ -1143,7 +1131,7 @@ const Stepper = () => {
                                                     value={section.subMotive || ''}
                                                     onChange={(e) => {
                                                       const newSections = [...sections];
-                                                      newSections[section.id - 1].subMotive = e.target.value;
+                                                      newSections[index].subMotive = e.target.value;
                                                       setSections(newSections);
                                                     }}
                                                 >
@@ -1169,7 +1157,7 @@ const Stepper = () => {
                                                     value={section.subMotive || ''}
                                                     onChange={(e) => {
                                                       const newSections = [...sections];
-                                                      newSections[section.id - 1].subMotive = e.target.value;
+                                                      newSections[index].subMotive = e.target.value;
                                                       setSections(newSections);
                                                     }}
                                                 >
@@ -1195,7 +1183,7 @@ const Stepper = () => {
                                                     value={section.subMotive || ''}
                                                     onChange={(e) => {
                                                       const newSections = [...sections];
-                                                      newSections[section.id - 1].subMotive = e.target.value;
+                                                      newSections[index].subMotive = e.target.value;
                                                       setSections(newSections);
                                                     }}
                                                 >
@@ -1219,10 +1207,10 @@ const Stepper = () => {
                                   placeholder="Ingresar Monto"
                                   className="w-full px-3 py-2 text-gray-800 border rounded outline-none bg-gray-50 focus:ring ring-emerald-500"
                                   // You can use section.id to uniquely identify inputs for each section
-                                  value={sections[section.id - 1].planCost || ''}
+                                  value={section.planCost || ''}
                                   onChange={(e) => {
                                     const newSections = [...sections];
-                                    newSections[section.id - 1].planCost = e.target.value;
+                                    newSections[index].planCost = e.target.value;
                                     setSections(newSections);
                                   }}
                                 />
@@ -1239,13 +1227,15 @@ const Stepper = () => {
                                     </button>
                                 </div> )}
 
-                               {/*  {index >= 1 && (   
-                                <div className='flex justify-center items-center mt-6 ml-4'>
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-8 h-8">
-                                      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" />
-                                    </svg>
-                                </div> )}
-                                */}
+                                 {index >= 1 && (   
+                              <div className='flex justify-center items-center mt-3.5 ml-4'>
+                                <button onClick={() => deleteSection(section.id)}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
+                                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm3 10.5a.75.75 0 000-1.5H9a.75.75 0 000 1.5h6z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div> )}
+                                
                             
                               </div>
                         </div>
