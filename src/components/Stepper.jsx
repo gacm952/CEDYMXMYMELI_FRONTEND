@@ -1067,9 +1067,11 @@ const Stepper = () => {
                                 onChange={handleFirstSelectChange}
                               >
                                 <option value="" hidden>Selecciona Una Opción</option>
-                                <option value="Diabetes">Diabetes</option>
-                                <option value="Optimización Corporal" >Optimización Corporal</option>
-                                <option value="Obesidad" >Obesidad</option>
+                                <option value="Plan de Obesidad">Plan de Diabetes</option>
+                                <option value="Plan de Obesidad">Plan de Obesidad</option>
+                                <option value="Plan de Obesidad Especializado" >Plan de Obesidad Especializado</option>
+                                <option value="Plan de Optimización Corporal" >Plan de Optimización Corporal</option>
+                                <option value="Plan de Optimización Corporal Especializado" >Plan de Optimización Corporal Especializado</option>
                               </select>
                           </div>
                     </div>
