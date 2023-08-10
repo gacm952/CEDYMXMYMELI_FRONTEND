@@ -403,7 +403,7 @@ const Stepper = () => {
     try {
 
       // Nuevo plan
-      if (monthsToPay != 0) {
+      if (from === '/MenuAdmission/CustomPlans') {
 
       const planData = {
                         soldBy: auth._id, 
@@ -427,7 +427,7 @@ const Stepper = () => {
 
       // Si se van a generar citas múltiples
 
-      if (monthsToPay && monthsToPay > 1) {
+      if (from === '/MenuAdmission/CustomPlans') {
         const appointments = [];
   
         for (let i = 0; i < monthsToPay; i++) {
