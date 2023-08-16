@@ -12,11 +12,13 @@ const BookingProvider = ({children}) => {
     const [alert, setAlert] = useState({})
     const [allBookings, setAllBookings] = useState({})
     const [dateFromBackend, setDateFromBackend] = useState(null);
+    const [allDoctors, setAllDoctors] = useState([])
     const navigate = useNavigate();
     const {auth} = useAuth();
     const isAdmission = auth.role === "Admission";
     const isAdmin = auth.role === "Admin"
     const isUser = auth.role === "User";
+    const isDoctor = auth.role === "Doctor"
 
     useEffect(() => {
         const getBookings = async () => {
@@ -82,6 +84,35 @@ const BookingProvider = ({children}) => {
         getDateBookings()
     }, [auth])
 
+    useEffect(() => {
+        const getAllDoctors = async () => {
+            try {
+                const token = localStorage.getItem('token')
+
+            if(!token) {
+                return
+            }
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const { data } = await costumerAxios('doctors/alldoctors', config)
+            
+            console.log(data)
+
+            setAllDoctors(data)
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getAllDoctors()
+    }, [auth])
+
     const submitBooking = async (booking, dataAction) => {
 
         if (booking.id) {
@@ -130,7 +161,7 @@ const BookingProvider = ({children}) => {
                 });
               
             setTimeout(() => {
-                if (isAdmission || isAdmin) {
+                if (isAdmission || isAdmin || isDoctor) {
                     navigate("/MenuAdmission/Today")
                 } 
 
@@ -169,7 +200,7 @@ const BookingProvider = ({children}) => {
 
                 setBookings((prevBookings) => [...prevBookings, data])
 
-                if (isAdmission || isAdmin) {
+                if (isAdmission || isAdmin || isDoctor) {
                     navigate("/MenuAdmission")
                 } 
     
@@ -343,6 +374,7 @@ const BookingProvider = ({children}) => {
         value={{
             alert,
             bookings,
+            allDoctors,
             submitBooking,
             dateFromBackend,
             newBooking,

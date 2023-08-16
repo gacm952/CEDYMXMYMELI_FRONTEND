@@ -9,9 +9,11 @@ import BookingContext from '../context/BookingProvider';
 import fc from 'festivos-colombia';
 import useAuth from '../hooks/useAuth';
 
-function Calendar({ onDateChange, onTimeChange }) {
+function Calendar({ onDateChange, onTimeChange, doctorMatchSchedule, doctorMatchDates }) {
 
   setDefaultOptions({ locale: es })
+
+  console.log(doctorMatchDates, doctorMatchSchedule)
 
   const [value, setValue] = useState(new Date())
   const [selectedTimes, setSelectedTimes] = useState([]);
@@ -21,12 +23,18 @@ function Calendar({ onDateChange, onTimeChange }) {
 
   const isUser = auth.role === "User"
 
-
   const getColombiaHolidays = (year) => {
     return fc.getHolidaysByYear(year)
       .filter((holiday) => holiday.static)
       .map((holiday) => new Date(holiday.date));
   };
+
+  const splitDatesAndTimes = doctorMatchDates.map(date => {
+    const dateTime = new Date(date);
+    const formattedDate = dateTime.toLocaleDateString('es-CO');
+    const formattedTime = dateTime.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+    return { date: formattedDate, time: formattedTime };
+  });
 
   useEffect(() => {
     if (dateFromBackend) {
@@ -66,20 +74,22 @@ function Calendar({ onDateChange, onTimeChange }) {
   };
 
   const shouldDisableTime = (selectedTime) => {
-    const minHour = 15;
-    const maxHour = 18;
+    const [startTime, endTime] = doctorMatchSchedule.split(' ');
+    const minHour = parseInt(startTime);
+    const maxHour = parseInt(endTime) + 12;
     const restStartHour = 12;
     const restEndHour = 14;
   
     const selectedHour = selectedTime.getHours();
     const selectedMinutes = selectedTime.getMinutes();
+    const selectedDateTime = new Date(value);
+    selectedDateTime.setHours(selectedHour);
+    selectedDateTime.setMinutes(selectedMinutes);
   
-    const dateKey = value.toDateString(); // Obtener la clave de la fecha seleccionada
-    const disabledTimesForDate = selectedTimes[dateKey];
-  
-    const countSelectedTimes = disabledTimesForDate ? disabledTimesForDate.filter(time =>
-      time.getHours() === selectedHour && time.getMinutes() === selectedMinutes
-    ).length : 0;
+    const isTimeBooked = doctorMatchDates.filter(date => {
+      const dateTime = new Date(date);
+      return dateTime.getTime() === selectedDateTime.getTime();
+    }).length;
   
     return (
       selectedHour < minHour ||
@@ -87,7 +97,7 @@ function Calendar({ onDateChange, onTimeChange }) {
       (selectedHour === minHour && selectedMinutes < 0) ||
       (selectedHour === maxHour && selectedMinutes > 0) ||
       (selectedHour >= restStartHour && selectedHour < restEndHour) ||
-      countSelectedTimes >= 1
+      isTimeBooked >= 2
     );
   };
 
@@ -99,7 +109,7 @@ function Calendar({ onDateChange, onTimeChange }) {
    
     // Verificar si todas las citas están seleccionadas para el día
      
-     const isAllTimesSelected = disabledTimesForDate && disabledTimesForDate.length === 144;
+     const isAllTimesSelected = disabledTimesForDate && disabledTimesForDate.length === 81;
   
     // Verificar si la fecha es un día feriado en Colombia
       const colombiaHolidays = getColombiaHolidays(date.getFullYear());

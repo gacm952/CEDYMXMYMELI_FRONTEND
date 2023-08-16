@@ -49,21 +49,37 @@ const Stepper = () => {
   const paymentMethod = sections.map(section => `${section.Motive}${section.subMotive ? ` ${section.subMotive}` : ''} ${section.planCost}`
   ).join(', ');
 
-  console.log(sections, paymentMethod, monthsToPay)
-
   const navigate = useNavigate();
   const params = useParams()
-  const { allBookings, submitBooking, bookings, newPlan } = useBookings();
+  const { allBookings, submitBooking, bookings, newPlan, allDoctors } = useBookings();
   const { auth, allUsers } = useAuth();
   const roleUser = [auth].some((role) => role.role === "User")
   const roleAdmission = [auth].some((role) => role.role === "Admission")
   const roleAdmin = [auth].some((role) => role.role === "Admin")
+  const roleDoctor = [auth].some((role) => role.role === "Doctor")
 
   const isResponsable = [auth].some((role) => role.responsable === true)
   const bookingData = allBookings.find(booking => booking._id === params.id) 
   const bookingAuth = allBookings.filter(booking => booking.bookingTo === auth._id)
   const bookingUserAuth = allBookings.filter(booking => booking.bookingTo === foundUserId)
 
+  const doctorMatchID = allDoctors.filter(doctor => doctor.Name === userData.Doctor)
+                                  .map(doctor => doctor._id)
+                                  .join('')
+
+  const doctorMatchSchedule = allDoctors.filter(doctor => doctor.Name === userData.Doctor)
+                                  .map(doctor => doctor.SchedulesAvailable)
+                                  .join('')                               
+
+  const doctorMatchDate = allBookings.filter(booking => booking.doctorIdBooked === doctorMatchID)
+                                     .map(booking => booking.dateHour)
+
+  const doctorMatchMotive = allDoctors.filter(doctor => doctor.Specialty === userData.Motive?.replace(/Primera vez|Control/g, "").trim() && doctor.Available)
+                                      .map(doctor => doctor.Name)
+                                       
+
+  console.log(doctorMatchMotive)
+  
   useEffect(() => {
     if (params.id) {
       setId(params.id);
@@ -105,8 +121,7 @@ const Stepper = () => {
       setIsVisitadorMedico(false);
     }
   }, [userData.Type]);
-
-  
+ 
   const addSection = () => {
     if (sections.length >= 5) {
       return; // Do not add more sections if the limit is reached
@@ -222,8 +237,8 @@ const Stepper = () => {
     const { name, value } = e.target;
     setUserData((prevData) => ({ ...prevData, [name]: value}));
 
-    const { Type, subType, Motive } = userData;
-    if (Type && Motive && (!Type === "EPS" || subType)) {
+    const { Type, subType, Motive, Doctor } = userData;
+    if (Type && Motive && Doctor && (!Type === "EPS" || subType)) {
       setIsFormValid(true);
     } else {
       setIsFormValid(false);
@@ -310,7 +325,7 @@ const Stepper = () => {
 
         // Verificar si el usuario autenticado es un Visitador Médico si es desde Admission
 
-        if (roleAdmission || roleAdmin) {
+        if (roleAdmission || roleAdmin || roleDoctor) {
           if (userData.Type === "Visitador Médico") {
     
             // Obtener las citas programadas del Visitador Médico para la fecha seleccionada
@@ -347,7 +362,7 @@ const Stepper = () => {
 
     let updatedMotive;
 
-    if (roleAdmission || roleAdmin) {
+    if (roleAdmission || roleAdmin || roleDoctor) {
 
       // Determinar el valor adecuado para la propiedad Motive
 
@@ -394,7 +409,6 @@ const Stepper = () => {
         }
     }
     
-
     const target = bookingData?.bookingTo || bookingData?.bookingFor || auth._id
     const paymentMethod = sections.map(section => `${section.Motive}${section.subMotive ? ` ${section.subMotive}` : ''} ${section.planCost}`).join(', ');
 
@@ -474,6 +488,7 @@ const Stepper = () => {
           bookingToName: foundUserName || bookingData?.bookingToName || auth.name,
           bookingToLastName: foundUserLastName || bookingData?.bookingToLastName || auth.lastName,
           bookingToEmail: foundUserEmail || bookingData?.bookingToEmail || '',
+          doctorIdBooked: doctorMatchID
         };
   
         if (id !== null) {
@@ -542,6 +557,8 @@ const Stepper = () => {
         }, 2000);
       }
     };
+
+  console.log(allDoctors)
 
   const StepOneNewBooking = () => {
     return (
@@ -739,6 +756,43 @@ const Stepper = () => {
                     )}
                     
         </div>
+
+        {userData.Motive && (
+          <div className="flex flex-col my-4">
+          <label
+            className="inline-flex mb-2 text-sm text-gray-800"
+            htmlFor='Doctor' 
+          >Selecciona al Médico </label
+          >
+          <select
+            id='Doctor'
+            className="
+              w-full
+              px-3
+              py-2
+              text-gray-800
+              border
+              rounded
+              outline-none
+              bg-gray-50
+              focus:ring
+              ring-emerald-500
+              font-poppins
+            "
+            name="Doctor" // Nombre del campo relacionado en el estado userData
+            value={userData.Doctor || ''}
+            onChange={handleUserDataChange}
+          >
+          <option value="" hidden>Selecciona Una Opción</option>
+            {doctorMatchMotive.map((doctorName, index) => (
+              <option key={index} value={doctorName}>{doctorName}</option>
+            ))}
+          </select>
+
+        </div>
+        )}
+
+     
       </>
     )
   };
@@ -795,7 +849,7 @@ const Stepper = () => {
 
   const renderStepContent = () => {
 
-    if ((roleUser && !params.id) || ((roleAdmission || roleAdmin) && from !== '/MenuAdmission/CustomPlans')) {
+    if ((roleUser && !params.id) || ((roleAdmission || roleAdmin || roleDoctor) && from !== '/MenuAdmission/CustomPlans')) {
     switch (step) {
       case 1:
         return (
@@ -901,7 +955,9 @@ const Stepper = () => {
           selectedDate={selectedDate}
           selectedTime={selectedTime} 
           onDateChange={handleDateChange} 
-          onTimeChange={handleTimeChange}/>
+          onTimeChange={handleTimeChange}
+          doctorMatchSchedule={doctorMatchSchedule}
+          doctorMatchDates={doctorMatchDate}/>
           </div>
         );
       case 3:
@@ -928,7 +984,10 @@ const Stepper = () => {
           selectedDate={selectedDate}
           selectedTime={selectedTime} 
           onDateChange={handleDateChange} 
-          onTimeChange={handleTimeChange}/>
+          onTimeChange={handleTimeChange}
+          doctorMatchSchedule={doctorMatchSchedule}
+          doctorMatchDates={doctorMatchDate}
+          />
           </div>
         );
       case 2:
@@ -1253,7 +1312,9 @@ const Stepper = () => {
           selectedDate={selectedDate}
           selectedTime={selectedTime} 
           onDateChange={handleDateChange} 
-          onTimeChange={handleTimeChange}/>
+          onTimeChange={handleTimeChange}
+          doctorMatchSchedule={doctorMatchSchedule}
+          doctorMatchDates={doctorMatchDate}/>
           </div>
         );
       case 4:
@@ -1374,7 +1435,7 @@ const Stepper = () => {
 
         {renderStepContent()}
 
-        {((roleUser && !params.id) || (roleAdmission || roleAdmin)) && from !== '/MenuAdmission/CustomPlans' && (
+        {((roleUser && !params.id) || (roleAdmission || roleAdmin || roleDoctor)) && from !== '/MenuAdmission/CustomPlans' && (
            <div className='flex items-center justify-between mt-4'>
            <div>
 

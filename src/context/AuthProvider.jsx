@@ -13,6 +13,7 @@ const AuthProvider = ({children}) => {
     const isAdmission = auth.role === "Admission"
     const isAdmin = auth.role === "Admin"
     const isUser = auth.role === "User"
+    const isDoctor = auth.role === "Doctor"
 
     useEffect(() => {     
         const AuthUser = async () => {
@@ -78,13 +79,13 @@ const AuthProvider = ({children}) => {
 
     useEffect(() => {
         if (!loading && auth) {
-          if (isAdmission || isAdmin) {
+          if (isAdmission || isAdmin || isDoctor) {
             navigate('/MenuAdmission'); 
           } else if (isUser) {
             navigate('/Menu'); 
           }
         }
-      }, [loading, auth, isAdmission, isAdmin, isUser]);
+      }, [loading, auth, isAdmission, isAdmin, isUser, isDoctor]);
 
     const submitResposable = async (userID, dataAction) => {
         try {

@@ -41,10 +41,22 @@ const Register = () => {
   const [lastName1, setLastName1] = useState('')
   const [secondLastName1, setSecondLastName1] = useState('')
 
+  const [userType, setUserType] = useState('')
+  const [specialty, setSpecialty] = useState('')
+  const [schedulesAvailable1, setSchedulesAvailable1] = useState('')
+  const [schedulesAvailable2, setSchedulesAvailable2] = useState('')
+  const [clinic, setClinic] = useState('')
+
   const navigate = useNavigate();
   const roleUser = [auth].some((role) => role.role === "User")
   const roleAdmission = [auth].some((role) => role.role === "Admission")
   const roleAdmin = [auth].some((role) => role.role === "Admin")
+  const roleDoctor = [auth].some((role) => role.role === "Doctor")
+
+  const schedulesAvailableTotal = `${schedulesAvailable1} ${schedulesAvailable2}`
+  const fullName = `${name || ''} ${secondName || ''} ${lastName || ''} ${secondLastName || ''}`.trim();
+  console.log(userType, specialty, schedulesAvailableTotal, clinic, fullName)
+
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -99,7 +111,7 @@ const Register = () => {
 
       const passwordError = passwordValidation(password);
 
-      if (!roleAdmission) {
+      if (!roleAdmission && !roleAdmin && !roleAdmission) {
         if ([password, confirmPassword, email].includes('')) {
           setAlert({
             msg: 'todos los campos son obligatorios',
@@ -258,9 +270,27 @@ const Register = () => {
             parentSecondName: secondName1,
             parentLastName: lastName1,
             parentLastSecondName: secondLastName1,
-        }) 
+        }),
+        ...(userType === "Doctor" && {
+            role: userType
+        })
       }) 
 
+      if (userType === "Doctor") {
+        const { data:data1 } = await costumerAxios.post(`/newdoctor`,
+        {
+        doctorId: data.user._id,
+        Name: fullName, 
+        Specialty: specialty,
+        SchedulesAvailable: schedulesAvailableTotal, 
+        Clinic: clinic,
+        }) 
+
+        console.log(data1)
+
+      }
+
+       
         await costumerAxios.post('/updateaction', {realizedBy: auth._id, document: document, typeDocument: typeDocument })
 
         setIsModalOpen(false)
@@ -366,7 +396,7 @@ const Register = () => {
   return (
     <>
 
-    {(roleAdmission || roleAdmin) && (
+    {(roleAdmission || roleAdmin || roleDoctor) && (
         <section className='w-full min-h-screen my-32 flex-grow flex justify-center items-center'>
 
         <Modal8 isOpen={isModalOpen} onClose={closeModal} />
@@ -441,7 +471,88 @@ const Register = () => {
 
                       <div className="mt-6 font-poppins">
                         <form onSubmit={handleSubmit} className="space-y-1" >
-                              <div className="mb-2 grid grid-cols-1 lg:grid-cols-2 lg:gap-3">
+                              <div className='mb-2'>
+                                  <label 
+                                  htmlFor="usuarioType" 
+                                  className="block font-semibold text-gray-700 mt-2 lg:mt-0">Selecciona Tipo de Usuario
+                                  </label>
+
+                                  <select
+                                  id="usuarioType"
+                                  className="mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                  value={userType}
+                                  onChange={e => setUserType(e.target.value)}
+                                >
+                                    <option value="" hidden>Tipo de Usuario ▼</option>
+                                    <option value="Paciente">Paciente</option>
+                                    <option value="Admission">Admisión</option>
+                                    <option value="Doctor">Doctor</option>
+                                  </select>                               
+                                </div>
+
+                                {userType === "Doctor" && (
+                                  <div className='grid grid-cols-1 lg:grid-cols-2 lg:gap-3'>
+                                    <div>
+                                      <label 
+                                      htmlFor="specialty" 
+                                      className="block font-semibold text-gray-700"> Especialidad
+                                      </label>
+                                      <input 
+                                        id='specialty'
+                                        type="text" 
+                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        placeholder="Especialidad"
+                                        value = {specialty}
+                                        onChange = {e => setSpecialty(e.target.value)} 
+                                      />
+                                  </div>
+
+                                  <div>
+                                      <label 
+                                      htmlFor="clinic" 
+                                      className="block font-semibold text-gray-700"> Clínica
+                                      </label>
+                                      <input 
+                                        id='clinic'
+                                        type="text" 
+                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        placeholder="Clínica"
+                                        value = {clinic}
+                                        onChange = {e => setClinic(e.target.value)} 
+                                      />
+                                  </div>
+
+                                  <div>
+                                      <label 
+                                      htmlFor="horario1" 
+                                      className="block font-semibold text-gray-700"> Horario de Inicio
+                                      </label>
+                                      <input 
+                                        id='horario1'
+                                        type="time" 
+                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value = {schedulesAvailable1}
+                                        onChange = {e => setSchedulesAvailable1(e.target.value)} 
+                                      />
+                                  </div>
+
+                                  <div>
+                                      <label 
+                                      htmlFor="horario2" 
+                                      className="block font-semibold text-gray-700"> Horario de Cierre
+                                      </label>
+                                      <input 
+                                        id='horario2'
+                                        type="time" 
+                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        value = {schedulesAvailable2}
+                                        onChange = {e => setSchedulesAvailable2(e.target.value)} 
+                                      />
+                                  </div>
+                                </div>
+                                )}
+
+                              <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 lg:gap-3">
                                   <div className=''>
                                   <label htmlFor="documento" className="block font-semibold font text-gray-700">
                                   Tipo de Documento 
@@ -817,7 +928,7 @@ const Register = () => {
         </section> 
     )}
 
-    {!roleAdmission && (
+    {(Object.keys(auth).length === 0) && (
         <div className="flex justify-center items-center mx-auto max-w-screen-2xl px-4 py-6 sm:pb-8 sm:pt-20 sm:px-6 lg:px-8">  
         <Modal8 isOpen={isModalOpen} onClose={closeModal} />
         <div className="grid">
