@@ -471,7 +471,10 @@ const Register = () => {
 
                       <div className="mt-6 font-poppins">
                         <form onSubmit={handleSubmit} className="space-y-1" >
-                              <div className='mb-2'>
+
+                          {roleAdmin && (
+                            <>
+                            <div className='mb-2'>
                                   <label 
                                   htmlFor="usuarioType" 
                                   className="block font-semibold text-gray-700 mt-2 lg:mt-0">Selecciona Tipo de Usuario
@@ -509,21 +512,6 @@ const Register = () => {
 
                                   <div>
                                       <label 
-                                      htmlFor="clinic" 
-                                      className="block font-semibold text-gray-700"> Clínica
-                                      </label>
-                                      <input 
-                                        id='clinic'
-                                        type="text" 
-                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="Clínica"
-                                        value = {clinic}
-                                        onChange = {e => setClinic(e.target.value)} 
-                                      />
-                                  </div>
-
-                                  <div>
-                                      <label 
                                       htmlFor="horario1" 
                                       className="block font-semibold text-gray-700"> Horario de Inicio
                                       </label>
@@ -551,6 +539,8 @@ const Register = () => {
                                   </div>
                                 </div>
                                 )}
+                            </>
+                          )}                         
 
                               <div className="mb-4 grid grid-cols-1 lg:grid-cols-2 lg:gap-3">
                                   <div className=''>
