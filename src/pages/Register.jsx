@@ -500,42 +500,23 @@ const Register = () => {
                                       htmlFor="specialty" 
                                       className="block font-semibold text-gray-700"> Especialidad
                                       </label>
-                                      <input 
-                                        id='specialty'
-                                        type="text" 
-                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        placeholder="Especialidad"
-                                        value = {specialty}
-                                        onChange = {e => setSpecialty(e.target.value)} 
-                                      />
-                                  </div>
-
-                                  <div>
-                                      <label 
-                                      htmlFor="horario1" 
-                                      className="block font-semibold text-gray-700"> Horario de Inicio
-                                      </label>
-                                      <input 
-                                        id='horario1'
-                                        type="time" 
-                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        value = {schedulesAvailable1}
-                                        onChange = {e => setSchedulesAvailable1(e.target.value)} 
-                                      />
-                                  </div>
-
-                                  <div>
-                                      <label 
-                                      htmlFor="horario2" 
-                                      className="block font-semibold text-gray-700"> Horario de Cierre
-                                      </label>
-                                      <input 
-                                        id='horario2'
-                                        type="time" 
-                                        className=" mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        value = {schedulesAvailable2}
-                                        onChange = {e => setSchedulesAvailable2(e.target.value)} 
-                                      />
+                                        <select
+                                              className="
+                                              mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline
+                                              "
+                                              id='specialty'
+                                              name="Motive" // Nombre del campo relacionado en el estado userData
+                                              value={specialty}
+                                              onChange = {e => setSpecialty(e.target.value)} 
+                                          >
+                                      <option value="" hidden>Selecciona Una Opción ▼</option>  
+                                      <option value="Medicina General">Medicina General</option>                                                                 
+                                      <option value="Ginecologia">Ginecología </option>                                    
+                                      <option value="Nutricion">Nutrición</option>
+                                      <option value="Medicina Interna">Medicina Interna</option>
+                                      <option value="Medicina Integral">Medicina Integral</option>
+                                      <option value="Psicologia">Psicología</option>
+                                      </select>
                                   </div>
                                 </div>
                                 )}
